@@ -1,0 +1,387 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+   Solace Browser — Master Theme
+   Translucent frosted glass UI with adaptive color system
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── CSS Custom Properties (Theme Engine) ──────────────────────────────────── */
+
+:root {
+  /* Core palette */
+  --solace-purple: #6C5CE7;
+  --solace-purple-light: #a29bfe;
+  --solace-blue: #74b9ff;
+  --solace-blue-dark: #0984e3;
+  --solace-pink: #fd79a8;
+  --solace-green: #00cec9;
+  --solace-orange: #e17055;
+  --solace-yellow: #ffeaa7;
+  --solace-red: #d63031;
+
+  /* Adaptive color — injected dynamically from page content */
+  --solace-adaptive-hue: 260;
+  --solace-adaptive-sat: 60%;
+  --solace-adaptive-light: 50%;
+
+  /* Surface colors */
+  --solace-bg-primary: rgba(10, 10, 18, 0.85);
+  --solace-bg-secondary: rgba(18, 18, 30, 0.78);
+  --solace-bg-tertiary: rgba(25, 25, 40, 0.72);
+  --solace-bg-hover: rgba(255, 255, 255, 0.06);
+  --solace-bg-active: rgba(255, 255, 255, 0.1);
+  --solace-bg-selected: rgba(108, 92, 231, 0.2);
+
+  /* Glass effect */
+  --solace-glass-bg: rgba(18, 18, 30, 0.65);
+  --solace-glass-border: rgba(255, 255, 255, 0.08);
+  --solace-glass-blur: 20px;
+  --solace-glass-saturate: 1.8;
+
+  /* Text */
+  --solace-text-primary: rgba(255, 255, 255, 0.92);
+  --solace-text-secondary: rgba(255, 255, 255, 0.6);
+  --solace-text-tertiary: rgba(255, 255, 255, 0.35);
+  --solace-text-accent: var(--solace-purple-light);
+
+  /* Borders */
+  --solace-border: rgba(255, 255, 255, 0.06);
+  --solace-border-hover: rgba(255, 255, 255, 0.12);
+  --solace-border-active: rgba(108, 92, 231, 0.4);
+  --solace-border-radius: 12px;
+  --solace-border-radius-sm: 8px;
+  --solace-border-radius-lg: 16px;
+  --solace-border-radius-pill: 100px;
+
+  /* Shadows */
+  --solace-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+  --solace-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
+  --solace-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --solace-shadow-glow: 0 0 20px rgba(108, 92, 231, 0.15);
+
+  /* Spacing — density modes */
+  --solace-density-factor: 1;  /* compact: 0.75, normal: 1, spacious: 1.25 */
+  --solace-spacing-xs: calc(2px * var(--solace-density-factor));
+  --solace-spacing-sm: calc(4px * var(--solace-density-factor));
+  --solace-spacing-md: calc(8px * var(--solace-density-factor));
+  --solace-spacing-lg: calc(12px * var(--solace-density-factor));
+  --solace-spacing-xl: calc(16px * var(--solace-density-factor));
+  --solace-spacing-2xl: calc(24px * var(--solace-density-factor));
+
+  /* Typography */
+  --solace-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --solace-font-mono: "SF Mono", "Cascadia Code", "JetBrains Mono", "Fira Code", monospace;
+  --solace-font-size-xs: 11px;
+  --solace-font-size-sm: 12px;
+  --solace-font-size-md: 13px;
+  --solace-font-size-lg: 15px;
+  --solace-font-size-xl: 18px;
+  --solace-font-size-2xl: 24px;
+
+  /* Animation */
+  --solace-transition-fast: 120ms ease-out;
+  --solace-transition-normal: 200ms ease-out;
+  --solace-transition-slow: 350ms cubic-bezier(0.16, 1, 0.3, 1);
+  --solace-transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Sidebar */
+  --solace-sidebar-width: 250px;
+  --solace-sidebar-collapsed-width: 48px;
+  --solace-tab-height: calc(36px * var(--solace-density-factor));
+
+  /* Z-index layers */
+  --solace-z-sidebar: 100;
+  --solace-z-toolbar: 200;
+  --solace-z-panel: 300;
+  --solace-z-commandbar: 500;
+  --solace-z-modal: 600;
+  --solace-z-toast: 700;
+  --solace-z-peek: 800;
+}
+
+/* ── Density Modes ─────────────────────────────────────────────────────────── */
+
+:root[solace-density="compact"] {
+  --solace-density-factor: 0.75;
+  --solace-tab-height: 28px;
+}
+
+:root[solace-density="spacious"] {
+  --solace-density-factor: 1.25;
+  --solace-tab-height: 44px;
+}
+
+/* ── Light Mode ────────────────────────────────────────────────────────────── */
+
+:root[solace-theme="light"] {
+  --solace-bg-primary: rgba(245, 245, 250, 0.9);
+  --solace-bg-secondary: rgba(235, 235, 245, 0.85);
+  --solace-bg-tertiary: rgba(225, 225, 240, 0.8);
+  --solace-bg-hover: rgba(0, 0, 0, 0.04);
+  --solace-bg-active: rgba(0, 0, 0, 0.08);
+  --solace-bg-selected: rgba(108, 92, 231, 0.12);
+
+  --solace-glass-bg: rgba(245, 245, 250, 0.7);
+  --solace-glass-border: rgba(0, 0, 0, 0.06);
+
+  --solace-text-primary: rgba(0, 0, 0, 0.87);
+  --solace-text-secondary: rgba(0, 0, 0, 0.55);
+  --solace-text-tertiary: rgba(0, 0, 0, 0.3);
+  --solace-text-accent: var(--solace-purple);
+
+  --solace-border: rgba(0, 0, 0, 0.06);
+  --solace-border-hover: rgba(0, 0, 0, 0.1);
+  --solace-border-active: rgba(108, 92, 231, 0.3);
+
+  --solace-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --solace-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --solace-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+  --solace-shadow-glow: 0 0 20px rgba(108, 92, 231, 0.08);
+}
+
+/* ── System Auto Mode ──────────────────────────────────────────────────────── */
+
+@media (prefers-color-scheme: light) {
+  :root[solace-theme="system"] {
+    --solace-bg-primary: rgba(245, 245, 250, 0.9);
+    --solace-bg-secondary: rgba(235, 235, 245, 0.85);
+    --solace-bg-tertiary: rgba(225, 225, 240, 0.8);
+    --solace-bg-hover: rgba(0, 0, 0, 0.04);
+    --solace-bg-active: rgba(0, 0, 0, 0.08);
+    --solace-bg-selected: rgba(108, 92, 231, 0.12);
+    --solace-glass-bg: rgba(245, 245, 250, 0.7);
+    --solace-glass-border: rgba(0, 0, 0, 0.06);
+    --solace-text-primary: rgba(0, 0, 0, 0.87);
+    --solace-text-secondary: rgba(0, 0, 0, 0.55);
+    --solace-text-tertiary: rgba(0, 0, 0, 0.3);
+    --solace-text-accent: var(--solace-purple);
+    --solace-border: rgba(0, 0, 0, 0.06);
+    --solace-border-hover: rgba(0, 0, 0, 0.1);
+    --solace-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+    --solace-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+    --solace-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   GLOBAL CHROME OVERRIDES
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Hide default Firefox tab bar — we use vertical tabs */
+#TabsToolbar {
+  visibility: collapse !important;
+  display: none !important;
+}
+
+/* Hide default Firefox sidebar */
+#sidebar-box {
+  display: none !important;
+}
+
+/* Main browser chrome — frosted glass */
+#navigator-toolbox {
+  background: var(--solace-glass-bg) !important;
+  backdrop-filter: blur(var(--solace-glass-blur)) saturate(var(--solace-glass-saturate)) !important;
+  -webkit-backdrop-filter: blur(var(--solace-glass-blur)) saturate(var(--solace-glass-saturate)) !important;
+  border-bottom: 1px solid var(--solace-glass-border) !important;
+  z-index: var(--solace-z-toolbar);
+}
+
+/* URL bar */
+#urlbar-background {
+  background: var(--solace-bg-secondary) !important;
+  border: 1px solid var(--solace-border) !important;
+  border-radius: var(--solace-border-radius) !important;
+  transition: border-color var(--solace-transition-fast),
+              box-shadow var(--solace-transition-fast) !important;
+}
+
+#urlbar[focused] #urlbar-background {
+  border-color: var(--solace-border-active) !important;
+  box-shadow: var(--solace-shadow-glow) !important;
+}
+
+#urlbar-input {
+  font-family: var(--solace-font-family) !important;
+  font-size: var(--solace-font-size-md) !important;
+  color: var(--solace-text-primary) !important;
+}
+
+/* Navigation buttons */
+#back-button,
+#forward-button,
+#reload-button,
+#stop-button,
+#home-button {
+  border-radius: var(--solace-border-radius-sm) !important;
+  transition: background var(--solace-transition-fast) !important;
+}
+
+#back-button:hover,
+#forward-button:hover,
+#reload-button:hover,
+#stop-button:hover,
+#home-button:hover {
+  background: var(--solace-bg-hover) !important;
+}
+
+/* Main content area */
+#browser {
+  background: var(--solace-bg-primary) !important;
+}
+
+/* Toolbar */
+#nav-bar {
+  background: transparent !important;
+  border: none !important;
+  padding: var(--solace-spacing-sm) var(--solace-spacing-md) !important;
+}
+
+/* Remove window controls padding (we handle it ourselves) */
+.titlebar-spacer {
+  display: none !important;
+}
+
+/* ── Focus Mode ────────────────────────────────────────────────────────────── */
+
+:root[solace-focus-mode="true"] #navigator-toolbox,
+:root[solace-focus-mode="true"] #solace-sidebar {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--solace-transition-slow) !important;
+}
+
+:root[solace-focus-mode="true"] #navigator-toolbox:hover,
+:root[solace-focus-mode="true"] #solace-sidebar:hover {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ── Ghost Mode ────────────────────────────────────────────────────────────── */
+
+:root[solace-ghost-mode="true"] #navigator-toolbox {
+  background: rgba(20, 20, 20, 0.95) !important;
+  border-bottom-color: rgba(255, 60, 60, 0.2) !important;
+}
+
+:root[solace-ghost-mode="true"] #navigator-toolbox::after {
+  content: "GHOST";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: rgba(255, 60, 60, 0.5);
+  pointer-events: none;
+}
+
+/* ── Scrollbar styling ─────────────────────────────────────────────────────── */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+:root[solace-theme="light"] * {
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+}
+
+/* ── Selection color ───────────────────────────────────────────────────────── */
+
+::selection {
+  background: rgba(108, 92, 231, 0.3);
+  color: inherit;
+}
+
+/* ── Tooltip styling ───────────────────────────────────────────────────────── */
+
+tooltip {
+  background: var(--solace-bg-primary) !important;
+  border: 1px solid var(--solace-border) !important;
+  border-radius: var(--solace-border-radius-sm) !important;
+  color: var(--solace-text-primary) !important;
+  font-family: var(--solace-font-family) !important;
+  font-size: var(--solace-font-size-sm) !important;
+  padding: var(--solace-spacing-sm) var(--solace-spacing-md) !important;
+  box-shadow: var(--solace-shadow-md) !important;
+}
+
+/* ── Context Menu ──────────────────────────────────────────────────────────── */
+
+menupopup {
+  --panel-background: var(--solace-glass-bg) !important;
+  --panel-border-color: var(--solace-glass-border) !important;
+  background: var(--solace-glass-bg) !important;
+  backdrop-filter: blur(var(--solace-glass-blur)) saturate(var(--solace-glass-saturate)) !important;
+  -webkit-backdrop-filter: blur(var(--solace-glass-blur)) saturate(var(--solace-glass-saturate)) !important;
+  border: 1px solid var(--solace-glass-border) !important;
+  border-radius: var(--solace-border-radius) !important;
+  padding: var(--solace-spacing-sm) !important;
+  box-shadow: var(--solace-shadow-lg) !important;
+}
+
+menuitem {
+  border-radius: var(--solace-border-radius-sm) !important;
+  padding: var(--solace-spacing-sm) var(--solace-spacing-md) !important;
+  transition: background var(--solace-transition-fast) !important;
+}
+
+menuitem:hover,
+menuitem[_moz-menuactive="true"] {
+  background: var(--solace-bg-hover) !important;
+}
+
+menuseparator {
+  border-color: var(--solace-border) !important;
+  margin: var(--solace-spacing-xs) var(--solace-spacing-sm) !important;
+}
+
+/* ── Panels (popup windows, dropdowns) ─────────────────────────────────────── */
+
+panel[type="arrow"],
+.panel-arrowcontent {
+  background: var(--solace-glass-bg) !important;
+  backdrop-filter: blur(var(--solace-glass-blur)) saturate(var(--solace-glass-saturate)) !important;
+  border: 1px solid var(--solace-glass-border) !important;
+  border-radius: var(--solace-border-radius-lg) !important;
+  box-shadow: var(--solace-shadow-lg) !important;
+  color: var(--solace-text-primary) !important;
+}
+
+/* ── Findbar ───────────────────────────────────────────────────────────────── */
+
+findbar {
+  background: var(--solace-glass-bg) !important;
+  backdrop-filter: blur(var(--solace-glass-blur)) !important;
+  border: none !important;
+  border-top: 1px solid var(--solace-glass-border) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+@keyframes solace-fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes solace-slide-in-left {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes solace-slide-in-right {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes solace-scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes solace-pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(108, 92, 231, 0); }
+  50%      { box-shadow: 0 0 12px 2px rgba(108, 92, 231, 0.15); }
+}

@@ -1,0 +1,52 @@
+{
+  "policies": {
+    "DisableTelemetry": true,
+    "DisableFirefoxStudies": true,
+    "DisablePocket": true,
+    "DisableFirefoxAccounts": true,
+    "DisableFirefoxScreenshots": true,
+    "DisableFormHistory": false,
+    "DisableSetDesktopBackground": true,
+    "DisplayBookmarksToolbar": "never",
+    "DontCheckDefaultBrowser": true,
+    "EnableTrackingProtection": {
+      "Value": true,
+      "Locked": false,
+      "Cryptomining": true,
+      "Fingerprinting": true
+    },
+    "EncryptedMediaExtensions": {
+      "Enabled": true,
+      "Locked": false
+    },
+    "HttpsOnlyMode": "force_enabled",
+    "NetworkPrediction": false,
+    "NoDefaultBookmarks": true,
+    "OfferToSaveLogins": true,
+    "OverrideFirstRunPage": "",
+    "OverridePostUpdatePage": "",
+    "PasswordManagerEnabled": false,
+    "SanitizeOnShutdown": {
+      "Cache": true,
+      "FormData": false,
+      "Downloads": false,
+      "Cookies": false,
+      "Sessions": false,
+      "OfflineApps": true,
+      "Locked": false
+    },
+    "SearchBar": "unified",
+    "UserMessaging": {
+      "ExtensionRecommendations": false,
+      "FeatureRecommendations": false,
+      "UrlbarInterventions": false,
+      "SkipOnboarding": true,
+      "MoreFromMozilla": false
+    },
+    "Extensions": {
+      "Install": [],
+      "Uninstall": [],
+      "Locked": []
+    }
+  }
+}

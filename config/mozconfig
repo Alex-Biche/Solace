@@ -1,0 +1,64 @@
+# Solace Browser — Build Configuration
+# Based on Firefox, customized for Solace
+
+# ── Application ───────────────────────────────────────────────────────────────
+ac_add_options --enable-application=browser
+ac_add_options --with-branding=browser/branding/solace
+ac_add_options --with-app-name=solace
+ac_add_options --with-app-basename=Solace
+ac_add_options --enable-update-channel=release
+
+# ── Performance optimizations ─────────────────────────────────────────────────
+ac_add_options --enable-optimize="-O3"
+ac_add_options --enable-lto=cross
+ac_add_options --enable-profile-generate  # PGO: first pass
+# ac_add_options --enable-profile-use      # PGO: second pass (uncomment after profiling)
+ac_add_options --enable-release
+ac_add_options --disable-debug
+ac_add_options --disable-debug-symbols
+ac_add_options --enable-strip
+ac_add_options --enable-install-strip
+
+# ── Rust ──────────────────────────────────────────────────────────────────────
+ac_add_options --enable-rust-simd
+
+# ── Hardware acceleration ─────────────────────────────────────────────────────
+ac_add_options --enable-webrender
+ac_add_options --enable-gpu-process
+
+# ── Privacy: Disable telemetry and data collection at build level ─────────────
+ac_add_options --disable-crashreporter
+ac_add_options --disable-updater
+ac_add_options --disable-tests
+ac_add_options --disable-debug
+ac_add_options --disable-dmd
+ac_add_options --disable-profiling
+ac_add_options --disable-geckodriver
+
+# Disable Normandy (Mozilla remote experiments)
+ac_add_options --disable-normandy
+
+# Disable Pocket integration
+ac_add_options MOZ_POCKET=0
+
+# ── macOS specific ────────────────────────────────────────────────────────────
+if test "$(uname)" = "Darwin"; then
+    # Use the macOS SDK
+    # ac_add_options --with-macos-sdk=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+    ac_add_options --enable-macos-target=12.0
+fi
+
+# ── Linux specific ────────────────────────────────────────────────────────────
+# Uncomment for Linux builds:
+# ac_add_options --enable-default-toolkit=cairo-gtk3-wayland
+
+# ── Custom defines ────────────────────────────────────────────────────────────
+export MOZ_APP_NAME=solace
+export MOZ_APP_DISPLAYNAME=Solace
+export MOZ_APP_REMOTINGNAME=Solace
+export MOZ_MACBUNDLE_NAME=Solace.app
+export MOZ_DISTRIBUTION_ID=org.solacebrowser
+export MOZ_TELEMETRY_REPORTING=
+export MOZ_DATA_REPORTING=
+export MOZ_SERVICES_HEALTHREPORT=
+export MOZ_REQUIRE_SIGNING=

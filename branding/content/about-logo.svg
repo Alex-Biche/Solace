@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="solace-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6C5CE7;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#a29bfe;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#74b9ff;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="128" cy="128" r="120" fill="url(#solace-grad)" opacity="0.15"/>
+  <circle cx="128" cy="128" r="120" fill="none" stroke="url(#solace-grad)" stroke-width="3"/>
+  <!-- S letterform -->
+  <path d="M 92 88 C 92 68, 116 56, 140 60 C 164 64, 176 80, 168 96 C 160 112, 128 116, 116 124 C 104 132, 96 148, 108 164 C 120 180, 148 180, 164 168"
+        fill="none" stroke="url(#solace-grad)" stroke-width="10" stroke-linecap="round" filter="url(#glow)"/>
+  <!-- Accent dots -->
+  <circle cx="88" cy="88" r="4" fill="#6C5CE7" opacity="0.8"/>
+  <circle cx="168" cy="168" r="4" fill="#74b9ff" opacity="0.8"/>
+  <!-- Text -->
+  <text x="128" y="220" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-size="24" font-weight="300" fill="url(#solace-grad)" letter-spacing="8">SOLACE</text>
+</svg>

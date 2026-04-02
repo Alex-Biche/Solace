@@ -1,0 +1,6 @@
+<!-- Solace Browser Branding DTD -->
+<!ENTITY  brandShorterName  "Solace">
+<!ENTITY  brandShortName    "Solace">
+<!ENTITY  brandFullName     "Solace Browser">
+<!ENTITY  vendorShortName   "Solace">
+<!ENTITY  trademarkInfo.part1 "Solace Browser">
