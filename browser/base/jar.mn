@@ -1,0 +1,43 @@
+# Solace Browser — Chrome JAR Manifest
+# Maps chrome:// URLs to actual file locations
+
+solace.jar:
+% content solace %content/ contentaccessible=yes
+
+  # Base
+  content/base/solace-init.js                                     (base/solace-init.js)
+
+  # Themes
+  content/themes/solace-theme.css                                  (themes/solace-theme.css)
+  content/themes/solace-adaptive-color.js                          (themes/solace-adaptive-color.js)
+
+  # Sidebar
+  content/components/sidebar/solace-sidebar.js                     (components/sidebar/solace-sidebar.js)
+  content/components/sidebar/solace-sidebar.css                    (components/sidebar/solace-sidebar.css)
+
+  # Core components
+  content/components/workspaces/solace-workspaces.js               (components/workspaces/solace-workspaces.js)
+  content/components/commandbar/solace-commandbar.js               (components/commandbar/solace-commandbar.js)
+  content/components/profiles/solace-profiles.js                   (components/profiles/solace-profiles.js)
+  content/components/split-view/solace-split-view.js               (components/split-view/solace-split-view.js)
+  content/components/focus-mode/solace-focus-mode.js               (components/focus-mode/solace-focus-mode.js)
+  content/components/ghost-mode/solace-ghost-mode.js               (components/ghost-mode/solace-ghost-mode.js)
+  content/components/tabs/solace-tab-groups.js                     (components/tabs/solace-tab-groups.js)
+
+  # Feature panels
+  content/components/notes/solace-notes.js                         (components/notes/solace-notes.js)
+  content/components/screenshots/solace-screenshots.js             (components/screenshots/solace-screenshots.js)
+  content/components/sessions/solace-sessions.js                   (components/sessions/solace-sessions.js)
+  content/components/reading-queue/solace-reading-queue.js         (components/reading-queue/solace-reading-queue.js)
+  content/components/sound-mixer/solace-sound-mixer.js             (components/sound-mixer/solace-sound-mixer.js)
+  content/components/css-editor/solace-css-editor.js               (components/css-editor/solace-css-editor.js)
+
+  # Advanced features
+  content/components/peek/solace-peek.js                           (components/peek/solace-peek.js)
+  content/components/distraction-lock/solace-distraction-lock.js   (components/distraction-lock/solace-distraction-lock.js)
+  content/components/pipe/solace-pipe.js                           (components/pipe/solace-pipe.js)
+  content/components/ai-panel/solace-ai-panel.js                   (components/ai-panel/solace-ai-panel.js)
+
+  # Pages
+  content/components/newtab/solace-newtab.html                     (components/newtab/solace-newtab.html)
+  content/components/onboarding/solace-onboarding.html             (components/onboarding/solace-onboarding.html)

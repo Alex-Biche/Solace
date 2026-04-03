@@ -1,0 +1,31 @@
+{
+  "manifest_version": 2,
+  "name": "Solace Shield",
+  "version": "1.0.0",
+  "description": "Built-in aggressive tracker and ad blocker for Solace Browser",
+  "author": "Solace Project",
+
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "<all_urls>",
+    "storage",
+    "tabs"
+  ],
+
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": true
+  },
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "shield@solacebrowser.org",
+      "strict_min_version": "115.0"
+    }
+  },
+
+  "icons": {
+    "48": "icon.svg"
+  }
+}

@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!-- Solace Browser — XUL Overlay for browser.xhtml
+     This overlay injects Solace scripts and styles into the main browser window. -->
+
+<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+         xmlns:html="http://www.w3.org/1999/xhtml">
+
+  <!-- Solace theme CSS -->
+  <html:link rel="stylesheet" href="chrome://solace/content/themes/solace-theme.css" />
+  <html:link rel="stylesheet" href="chrome://solace/content/components/sidebar/solace-sidebar.css" />
+
+  <!-- Solace component scripts -->
+  <script type="application/javascript" src="chrome://solace/content/themes/solace-adaptive-color.js" />
+
+  <!-- Core -->
+  <script type="application/javascript" src="chrome://solace/content/components/profiles/solace-profiles.js" />
+  <script type="application/javascript" src="chrome://solace/content/components/workspaces/solace-workspaces.js" />
+  <script type="application/javascript" src="chrome://solace/content/components/tabs/solace-tab-groups.js" />
+  <script type="application/javascript" src="chrome://solace/content/components/sidebar/solace-sidebar.js" />
+  <script type="application/javascript" src="chrome://solace/content/components/commandbar/solace-commandbar.js" />
+  <script type="application/javascript" src="chrome://solace/content/components/split-view/solace-split-view.js" />
+  <script type="application/javascript" src="chrome://solace/content/components/focus-mode/solace-focus-mode.js" />
+  <script type="application/javascript" src="chrome://solace/content/components/ghost-mode/solace-ghost-mode.js" />
+
+  <!-- Feature panels -->
+  <script type="application/javascript" src="chrome://solace/content/components/notes/solace-notes.js" />
+  <script type="application/javascript" src="chrome://solace/content/components/screenshots/solace-screenshots.js" />
+  <script type="application/javascript" src="chrome://solace/content/components/sessions/solace-sessions.js" />
+  <script type="application/javascript" src="chrome://solace/content/components/reading-queue/solace-reading-queue.js" />
+  <script type="application/javascript" src="chrome://solace/content/components/sound-mixer/solace-sound-mixer.js" />
+  <script type="application/javascript" src="chrome://solace/content/components/css-editor/solace-css-editor.js" />
+
+  <!-- Advanced features -->
+  <script type="application/javascript" src="chrome://solace/content/components/peek/solace-peek.js" />
+  <script type="application/javascript" src="chrome://solace/content/components/distraction-lock/solace-distraction-lock.js" />
+  <script type="application/javascript" src="chrome://solace/content/components/pipe/solace-pipe.js" />
+  <script type="application/javascript" src="chrome://solace/content/components/ai-panel/solace-ai-panel.js" />
+
+  <!-- Main initialization (must be last) -->
+  <script type="application/javascript" src="chrome://solace/content/base/solace-init.js" />
+
+</overlay>

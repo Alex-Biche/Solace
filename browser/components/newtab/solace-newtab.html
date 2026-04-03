@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New Tab — Solace</title>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --text: rgba(255, 255, 255, 0.9);
+      --text-dim: rgba(255, 255, 255, 0.35);
+      --text-muted: rgba(255, 255, 255, 0.55);
+      --accent: #6C5CE7;
+      --accent-light: #a29bfe;
+      --surface: rgba(255, 255, 255, 0.04);
+      --border: rgba(255, 255, 255, 0.06);
+      --glass-bg: rgba(18, 18, 30, 0.6);
+      --glass-blur: 20px;
+      --radius: 16px;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f5f5fa;
+        --text: rgba(0, 0, 0, 0.85);
+        --text-dim: rgba(0, 0, 0, 0.25);
+        --text-muted: rgba(0, 0, 0, 0.5);
+        --surface: rgba(0, 0, 0, 0.03);
+        --border: rgba(0, 0, 0, 0.06);
+        --glass-bg: rgba(245, 245, 250, 0.7);
+      }
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* ── Background gradient orbs ─────────────────────────────── */
+    .bg-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.08;
+      pointer-events: none;
+      animation: float 20s ease-in-out infinite;
+    }
+
+    .bg-orb-1 {
+      width: 600px; height: 600px;
+      background: var(--accent);
+      top: -200px; left: -100px;
+    }
+
+    .bg-orb-2 {
+      width: 400px; height: 400px;
+      background: #74b9ff;
+      bottom: -150px; right: -50px;
+      animation-delay: -7s;
+    }
+
+    .bg-orb-3 {
+      width: 300px; height: 300px;
+      background: #fd79a8;
+      top: 30%; right: 20%;
+      animation-delay: -14s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -20px) scale(1.05); }
+      66% { transform: translate(-20px, 15px) scale(0.95); }
+    }
+
+    /* ── Main content ─────────────────────────────────────────── */
+    .container {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      width: 100%;
+      max-width: 640px;
+      padding: 0 24px;
+    }
+
+    /* ── Clock ────────────────────────────────────────────────── */
+    .clock {
+      font-size: 72px;
+      font-weight: 200;
+      letter-spacing: -2px;
+      line-height: 1;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--text), var(--text-muted));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .date {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--text-dim);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 48px;
+    }
+
+    /* ── Search bar ───────────────────────────────────────────── */
+    .search-container {
+      position: relative;
+      width: 100%;
+      margin-bottom: 48px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 16px 24px 16px 48px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur)) saturate(1.8);
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.8);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-family: var(--font);
+      font-size: 16px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 200ms, box-shadow 200ms;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-dim);
+    }
+
+    .search-input:focus {
+      border-color: rgba(108, 92, 231, 0.4);
+      box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.08), 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      font-size: 16px;
+      pointer-events: none;
+    }
+
+    .search-hint {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 11px;
+      color: var(--text-dim);
+      background: var(--surface);
+      padding: 3px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      pointer-events: none;
+    }
+
+    /* ── Quick links ──────────────────────────────────────────── */
+    .quick-links {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .quick-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      text-decoration: none;
+      color: var(--text-muted);
+      font-size: 13px;
+      transition: all 200ms ease-out;
+      cursor: pointer;
+    }
+
+    .quick-link:hover {
+      background: rgba(108, 92, 231, 0.1);
+      border-color: rgba(108, 92, 231, 0.2);
+      color: var(--text);
+      transform: translateY(-1px);
+    }
+
+    .quick-link-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      background: var(--surface);
+    }
+
+    /* ── Greeting ─────────────────────────────────────────────── */
+    .greeting {
+      font-size: 18px;
+      font-weight: 300;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    /* ── Bottom bar ───────────────────────────────────────────── */
+    .bottom-bar {
+      position: fixed;
+      bottom: 16px;
+      display: flex;
+      gap: 16px;
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    .bottom-bar a {
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 200ms;
+    }
+
+    .bottom-bar a:hover {
+      color: var(--accent-light);
+    }
+
+    /* ── Animations ───────────────────────────────────────────── */
+    .fade-in {
+      animation: fadeIn 600ms ease-out both;
+    }
+
+    .fade-in-delay-1 { animation-delay: 100ms; }
+    .fade-in-delay-2 { animation-delay: 200ms; }
+    .fade-in-delay-3 { animation-delay: 300ms; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background orbs -->
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+  <div class="bg-orb bg-orb-3"></div>
+
+  <div class="container">
+    <div class="greeting fade-in" id="greeting"></div>
+    <div class="clock fade-in fade-in-delay-1" id="clock"></div>
+    <div class="date fade-in fade-in-delay-1" id="date"></div>
+
+    <div class="search-container fade-in fade-in-delay-2">
+      <span class="search-icon">🔍</span>
+      <input
+        class="search-input"
+        type="text"
+        id="search"
+        placeholder="Search or enter URL..."
+        autofocus
+        autocomplete="off"
+      />
+      <span class="search-hint">⌘K commands</span>
+    </div>
+
+    <div class="quick-links fade-in fade-in-delay-3" id="quick-links">
+      <!-- Populated dynamically -->
+    </div>
+  </div>
+
+  <div class="bottom-bar fade-in fade-in-delay-3">
+    <span id="tab-count"></span>
+  </div>
+
+  <script>
+    "use strict";
+
+    // ── Clock ────────────────────────────────────────────────────
+    function updateClock() {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, "0");
+      const minutes = now.getMinutes().toString().padStart(2, "0");
+      document.getElementById("clock").textContent = `${hours}:${minutes}`;
+
+      const options = { weekday: "long", month: "long", day: "numeric" };
+      document.getElementById("date").textContent = now.toLocaleDateString("en-US", options);
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // ── Greeting ─────────────────────────────────────────────────
+    function updateGreeting() {
+      const hour = new Date().getHours();
+      let greeting;
+      if (hour < 6) greeting = "Good night";
+      else if (hour < 12) greeting = "Good morning";
+      else if (hour < 18) greeting = "Good afternoon";
+      else greeting = "Good evening";
+
+      document.getElementById("greeting").textContent = greeting;
+    }
+    updateGreeting();
+
+    // ── Search ───────────────────────────────────────────────────
+    const searchInput = document.getElementById("search");
+
+    searchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        const query = searchInput.value.trim();
+        if (!query) return;
+
+        // Check if it's a URL
+        if (/^(https?:\/\/|www\.)/.test(query) || /^[^\s]+\.[a-z]{2,}$/i.test(query)) {
+          let url = query;
+          if (!url.startsWith("http")) url = "https://" + url;
+          window.location.href = url;
+        } else {
+          // Search with DuckDuckGo by default (privacy)
+          window.location.href = `https://duckduckgo.com/?q=${encodeURIComponent(query)}`;
+        }
+      }
+    });
+
+    // ── Quick links (most visited) ───────────────────────────────
+    const defaultLinks = [
+      { icon: "📧", title: "Mail", url: "https://mail.google.com" },
+      { icon: "📰", title: "News", url: "https://news.ycombinator.com" },
+      { icon: "💻", title: "GitHub", url: "https://github.com" },
+      { icon: "📺", title: "YouTube", url: "https://youtube.com" },
+    ];
+
+    const linksContainer = document.getElementById("quick-links");
+    for (const link of defaultLinks) {
+      const a = document.createElement("a");
+      a.className = "quick-link";
+      a.href = link.url;
+      a.innerHTML = `
+        <span class="quick-link-icon">${link.icon}</span>
+        ${link.title}
+      `;
+      linksContainer.appendChild(a);
+    }
+
+    // ── Focus search on any keypress ─────────────────────────────
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "/" || (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey)) {
+        if (document.activeElement !== searchInput) {
+          searchInput.focus();
+          if (e.key === "/") e.preventDefault();
+        }
+      }
+    });
+  </script>
+</body>
+</html>

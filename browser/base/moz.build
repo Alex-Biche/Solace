@@ -1,0 +1,18 @@
+# Solace Browser — Build System Integration
+# This moz.build file registers Solace components with the Firefox build system.
+
+DIRS += [
+    'components',
+]
+
+# Chrome manifest for Solace
+JAR_MANIFESTS += ['jar.mn']
+
+# Extra JS modules
+EXTRA_JS_MODULES += [
+    'solace-init.js',
+]
+
+BROWSER_CHROME_MANIFESTS += [
+    'solace-browser-overlay.xhtml',
+]

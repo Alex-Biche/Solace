@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to Solace</title>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --text: rgba(255, 255, 255, 0.92);
+      --text-dim: rgba(255, 255, 255, 0.35);
+      --text-muted: rgba(255, 255, 255, 0.6);
+      --accent: #6C5CE7;
+      --accent-light: #a29bfe;
+      --accent-blue: #74b9ff;
+      --surface: rgba(255, 255, 255, 0.04);
+      --border: rgba(255, 255, 255, 0.08);
+      --glass-bg: rgba(18, 18, 30, 0.65);
+      --radius: 16px;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Background */
+    .bg-gradient {
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(108, 92, 231, 0.12), transparent 60%),
+        radial-gradient(ellipse at 80% 80%, rgba(116, 185, 255, 0.08), transparent 60%),
+        radial-gradient(ellipse at 50% 50%, rgba(253, 121, 168, 0.05), transparent 60%);
+      pointer-events: none;
+    }
+
+    /* Container */
+    .onboarding {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 720px;
+      padding: 0 24px;
+    }
+
+    /* Steps */
+    .step {
+      display: none;
+      animation: fadeIn 500ms ease-out;
+    }
+    .step.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Welcome screen */
+    .welcome-logo {
+      width: 80px; height: 80px; margin: 0 auto 24px;
+    }
+
+    h1 {
+      font-size: 36px; font-weight: 200; letter-spacing: 0.2em;
+      text-align: center; margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light), var(--accent-blue));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    .subtitle {
+      text-align: center; font-size: 15px; color: var(--text-muted);
+      margin-bottom: 48px; line-height: 1.6;
+    }
+
+    /* Step header */
+    .step-header {
+      text-align: center; margin-bottom: 32px;
+    }
+    .step-header h2 {
+      font-size: 24px; font-weight: 500; margin-bottom: 8px;
+    }
+    .step-header p {
+      font-size: 14px; color: var(--text-muted); line-height: 1.5;
+    }
+
+    /* Progress bar */
+    .progress {
+      display: flex; gap: 6px; justify-content: center; margin-bottom: 40px;
+    }
+    .progress-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--border); transition: all 300ms;
+    }
+    .progress-dot.active {
+      background: var(--accent); width: 24px; border-radius: 4px;
+    }
+    .progress-dot.done {
+      background: var(--accent-light);
+    }
+
+    /* Option cards */
+    .options-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .option-card {
+      padding: 20px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all 200ms;
+      text-align: center;
+    }
+
+    .option-card:hover {
+      border-color: rgba(108, 92, 231, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .option-card.selected {
+      border-color: var(--accent);
+      background: rgba(108, 92, 231, 0.1);
+      box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2);
+    }
+
+    .option-card .icon { font-size: 28px; margin-bottom: 10px; }
+    .option-card .label {
+      font-size: 14px; font-weight: 500; margin-bottom: 4px;
+    }
+    .option-card .desc {
+      font-size: 12px; color: var(--text-muted); line-height: 1.4;
+    }
+
+    /* Toggle options */
+    .toggle-list {
+      display: flex; flex-direction: column; gap: 10px;
+      margin-bottom: 32px;
+    }
+
+    .toggle-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 18px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 200ms;
+    }
+
+    .toggle-item:hover { border-color: rgba(108, 92, 231, 0.2); }
+
+    .toggle-item .toggle-icon { font-size: 20px; flex-shrink: 0; }
+
+    .toggle-item .toggle-text {
+      flex: 1;
+    }
+    .toggle-item .toggle-text .name {
+      font-size: 14px; font-weight: 500; margin-bottom: 2px;
+    }
+    .toggle-item .toggle-text .detail {
+      font-size: 12px; color: var(--text-muted);
+    }
+
+    .toggle-switch {
+      width: 44px; height: 24px; border-radius: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      position: relative; flex-shrink: 0;
+      transition: background 200ms;
+    }
+
+    .toggle-switch.on { background: var(--accent); }
+
+    .toggle-switch::after {
+      content: "";
+      position: absolute; top: 2px; left: 2px;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: white;
+      transition: transform 200ms;
+    }
+
+    .toggle-switch.on::after { transform: translateX(20px); }
+
+    /* Buttons */
+    .btn-row {
+      display: flex; justify-content: center; gap: 12px;
+    }
+
+    .btn {
+      padding: 12px 32px;
+      border: none; border-radius: 12px;
+      font-family: var(--font); font-size: 14px; font-weight: 500;
+      cursor: pointer; transition: all 200ms;
+    }
+
+    .btn-primary {
+      background: var(--accent); color: white;
+    }
+    .btn-primary:hover {
+      background: #5f4dd0; transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(108, 92, 231, 0.3);
+    }
+
+    .btn-secondary {
+      background: var(--surface); color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    /* Color picker */
+    .color-row {
+      display: flex; gap: 10px; justify-content: center; margin-bottom: 24px;
+    }
+    .color-swatch {
+      width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
+      border: 3px solid transparent; transition: all 200ms;
+    }
+    .color-swatch:hover { transform: scale(1.1); }
+    .color-swatch.selected { border-color: white; box-shadow: 0 0 0 2px var(--accent); }
+
+    /* Final screen */
+    .final-icon { font-size: 48px; text-align: center; margin-bottom: 16px; }
+    .features-list {
+      display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+      margin: 24px 0 32px;
+    }
+    .feature-badge {
+      padding: 6px 14px; border-radius: 100px; font-size: 12px;
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-gradient"></div>
+
+  <div class="onboarding">
+    <div class="progress" id="progress"></div>
+
+    <!-- Step 0: Welcome -->
+    <div class="step active" data-step="0">
+      <div style="text-align:center;">
+        <img class="welcome-logo" src="solace-logo.png" alt="Solace" onerror="this.style.display='none'" />
+        <h1>SOLACE</h1>
+        <p class="subtitle">
+          A browser built for focus, privacy, and flow.<br/>
+          Let's set things up the way you like.
+        </p>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="nextStep()">Get Started</button>
+          <button class="btn btn-secondary" onclick="skipAll()">Skip Setup</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 1: Theme -->
+    <div class="step" data-step="1">
+      <div class="step-header">
+        <h2>Choose Your Theme</h2>
+        <p>You can always change this later in settings.</p>
+      </div>
+      <div class="options-grid">
+        <div class="option-card selected" data-choice="theme" data-value="dark">
+          <div class="icon">🌙</div>
+          <div class="label">Dark</div>
+          <div class="desc">Easy on the eyes</div>
+        </div>
+        <div class="option-card" data-choice="theme" data-value="light">
+          <div class="icon">☀️</div>
+          <div class="label">Light</div>
+          <div class="desc">Clean and bright</div>
+        </div>
+        <div class="option-card" data-choice="theme" data-value="system">
+          <div class="icon">💻</div>
+          <div class="label">System Auto</div>
+          <div class="desc">Matches your OS</div>
+        </div>
+        <div class="option-card" data-choice="theme" data-value="custom">
+          <div class="icon">🎨</div>
+          <div class="label">Custom</div>
+          <div class="desc">Full theme engine</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+        <button class="btn btn-primary" onclick="nextStep()">Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Accent Color -->
+    <div class="step" data-step="2">
+      <div class="step-header">
+        <h2>Accent Color</h2>
+        <p>Pick a color that tints your sidebar and UI.</p>
+      </div>
+      <div class="color-row">
+        <div class="color-swatch selected" data-color="#6C5CE7" style="background:#6C5CE7"></div>
+        <div class="color-swatch" data-color="#0984e3" style="background:#0984e3"></div>
+        <div class="color-swatch" data-color="#00cec9" style="background:#00cec9"></div>
+        <div class="color-swatch" data-color="#00b894" style="background:#00b894"></div>
+        <div class="color-swatch" data-color="#fdcb6e" style="background:#fdcb6e"></div>
+        <div class="color-swatch" data-color="#e17055" style="background:#e17055"></div>
+        <div class="color-swatch" data-color="#d63031" style="background:#d63031"></div>
+        <div class="color-swatch" data-color="#fd79a8" style="background:#fd79a8"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+        <button class="btn btn-primary" onclick="nextStep()">Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Density -->
+    <div class="step" data-step="3">
+      <div class="step-header">
+        <h2>UI Density</h2>
+        <p>How much space do you want between elements?</p>
+      </div>
+      <div class="options-grid" style="grid-template-columns:1fr 1fr 1fr;">
+        <div class="option-card" data-choice="density" data-value="compact">
+          <div class="icon">▪️</div>
+          <div class="label">Compact</div>
+          <div class="desc">Maximum screen space</div>
+        </div>
+        <div class="option-card selected" data-choice="density" data-value="normal">
+          <div class="icon">◾</div>
+          <div class="label">Normal</div>
+          <div class="desc">Balanced</div>
+        </div>
+        <div class="option-card" data-choice="density" data-value="spacious">
+          <div class="icon">⬛</div>
+          <div class="label">Spacious</div>
+          <div class="desc">Touch-friendly</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+        <button class="btn btn-primary" onclick="nextStep()">Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 4: Privacy Level -->
+    <div class="step" data-step="4">
+      <div class="step-header">
+        <h2>Privacy Level</h2>
+        <p>Solace is private by default. Adjust further if you want.</p>
+      </div>
+      <div class="options-grid">
+        <div class="option-card" data-choice="privacy" data-value="standard">
+          <div class="icon">🛡</div>
+          <div class="label">Standard</div>
+          <div class="desc">Block trackers and ads. HTTPS-only.</div>
+        </div>
+        <div class="option-card selected" data-choice="privacy" data-value="strict">
+          <div class="icon">🔒</div>
+          <div class="label">Strict</div>
+          <div class="desc">+ Fingerprint protection, first-party isolation</div>
+        </div>
+        <div class="option-card" data-choice="privacy" data-value="paranoid">
+          <div class="icon">👻</div>
+          <div class="label">Paranoid</div>
+          <div class="desc">+ Disable JS by default, block all cookies</div>
+        </div>
+        <div class="option-card" data-choice="privacy" data-value="relaxed">
+          <div class="icon">🌐</div>
+          <div class="label">Relaxed</div>
+          <div class="desc">Fewer protections, maximum compatibility</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+        <button class="btn btn-primary" onclick="nextStep()">Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 5: Feature toggles -->
+    <div class="step" data-step="5">
+      <div class="step-header">
+        <h2>Features</h2>
+        <p>Enable or disable individual features. All can be changed later.</p>
+      </div>
+      <div class="toggle-list">
+        <div class="toggle-item" data-feature="workspaces">
+          <span class="toggle-icon">📂</span>
+          <div class="toggle-text">
+            <div class="name">Workspaces</div>
+            <div class="detail">Organize tabs into named groups</div>
+          </div>
+          <div class="toggle-switch on" data-toggle="workspaces"></div>
+        </div>
+        <div class="toggle-item" data-feature="tab-sleep">
+          <span class="toggle-icon">💤</span>
+          <div class="toggle-text">
+            <div class="name">Tab Sleep</div>
+            <div class="detail">Suspend inactive tabs to save RAM</div>
+          </div>
+          <div class="toggle-switch on" data-toggle="tab-sleep"></div>
+        </div>
+        <div class="toggle-item" data-feature="peek">
+          <span class="toggle-icon">👀</span>
+          <div class="toggle-text">
+            <div class="name">Peek Links</div>
+            <div class="detail">Preview links without leaving your tab</div>
+          </div>
+          <div class="toggle-switch on" data-toggle="peek"></div>
+        </div>
+        <div class="toggle-item" data-feature="sound-mixer">
+          <span class="toggle-icon">🔊</span>
+          <div class="toggle-text">
+            <div class="name">Sound Mixer</div>
+            <div class="detail">Per-tab volume control</div>
+          </div>
+          <div class="toggle-switch on" data-toggle="sound-mixer"></div>
+        </div>
+        <div class="toggle-item" data-feature="ai">
+          <span class="toggle-icon">🤖</span>
+          <div class="toggle-text">
+            <div class="name">AI Panel</div>
+            <div class="detail">Connect your own AI provider (off by default)</div>
+          </div>
+          <div class="toggle-switch" data-toggle="ai"></div>
+        </div>
+        <div class="toggle-item" data-feature="pipe">
+          <span class="toggle-icon">📡</span>
+          <div class="toggle-text">
+            <div class="name">Pipe</div>
+            <div class="detail">Share tabs across devices on your network</div>
+          </div>
+          <div class="toggle-switch on" data-toggle="pipe"></div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+        <button class="btn btn-primary" onclick="nextStep()">Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 6: Import -->
+    <div class="step" data-step="6">
+      <div class="step-header">
+        <h2>Import Your Data</h2>
+        <p>Bring your bookmarks, history, and passwords from another browser.</p>
+      </div>
+      <div class="options-grid">
+        <div class="option-card" data-choice="import" data-value="chrome">
+          <div class="icon">🌐</div>
+          <div class="label">Chrome</div>
+        </div>
+        <div class="option-card" data-choice="import" data-value="firefox">
+          <div class="icon">🦊</div>
+          <div class="label">Firefox</div>
+        </div>
+        <div class="option-card" data-choice="import" data-value="safari">
+          <div class="icon">🧭</div>
+          <div class="label">Safari</div>
+        </div>
+        <div class="option-card" data-choice="import" data-value="none">
+          <div class="icon">✨</div>
+          <div class="label">Fresh Start</div>
+          <div class="desc">Start with a clean slate</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+        <button class="btn btn-primary" onclick="nextStep()">Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 7: Done -->
+    <div class="step" data-step="7">
+      <div class="final-icon">✨</div>
+      <h1 style="font-size:28px; letter-spacing:0.1em;">You're All Set</h1>
+      <p class="subtitle">Solace is configured and ready to go.</p>
+      <div class="features-list">
+        <span class="feature-badge">Zero Telemetry</span>
+        <span class="feature-badge">Vertical Tabs</span>
+        <span class="feature-badge">Workspaces</span>
+        <span class="feature-badge">Translucent UI</span>
+        <span class="feature-badge">Ad Blocker</span>
+        <span class="feature-badge">⌘K Command Bar</span>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="finish()" style="padding:14px 48px; font-size:16px;">
+          Start Browsing
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    "use strict";
+
+    const TOTAL_STEPS = 8;
+    let currentStep = 0;
+    const settings = {
+      theme: "dark",
+      accentColor: "#6C5CE7",
+      density: "normal",
+      privacy: "strict",
+      features: {
+        workspaces: true,
+        "tab-sleep": true,
+        peek: true,
+        "sound-mixer": true,
+        ai: false,
+        pipe: true,
+      },
+      import: "none",
+    };
+
+    // ── Progress dots ─────────────────────────────────────────────
+    function updateProgress() {
+      const bar = document.getElementById("progress");
+      bar.innerHTML = "";
+      for (let i = 0; i < TOTAL_STEPS; i++) {
+        const dot = document.createElement("div");
+        dot.className = "progress-dot";
+        if (i === currentStep) dot.classList.add("active");
+        else if (i < currentStep) dot.classList.add("done");
+        bar.appendChild(dot);
+      }
+    }
+
+    // ── Navigation ────────────────────────────────────────────────
+    function showStep(n) {
+      document.querySelectorAll(".step").forEach((s) => s.classList.remove("active"));
+      const step = document.querySelector(`[data-step="${n}"]`);
+      if (step) step.classList.add("active");
+      currentStep = n;
+      updateProgress();
+    }
+
+    function nextStep() { showStep(currentStep + 1); }
+    function prevStep() { showStep(currentStep - 1); }
+
+    function skipAll() {
+      finish();
+    }
+
+    function finish() {
+      // Send settings to the browser chrome via message
+      try {
+        // In real Gecko integration, this would use:
+        // window.messageManager.sendAsyncMessage("SolaceOnboarding:Complete", settings);
+        const event = new CustomEvent("solace-onboarding-complete", { detail: settings });
+        window.dispatchEvent(event);
+      } catch (e) {}
+
+      // Navigate to new tab
+      window.location.href = "about:solace-newtab";
+    }
+
+    // ── Option card selection ─────────────────────────────────────
+    document.addEventListener("click", (e) => {
+      const card = e.target.closest(".option-card[data-choice]");
+      if (card) {
+        const choice = card.dataset.choice;
+        const value = card.dataset.value;
+
+        // Deselect siblings
+        card.parentElement.querySelectorAll(".option-card").forEach((c) => c.classList.remove("selected"));
+        card.classList.add("selected");
+
+        settings[choice] = value;
+      }
+
+      // Color swatch
+      const swatch = e.target.closest(".color-swatch");
+      if (swatch) {
+        document.querySelectorAll(".color-swatch").forEach((s) => s.classList.remove("selected"));
+        swatch.classList.add("selected");
+        settings.accentColor = swatch.dataset.color;
+      }
+
+      // Toggle switch
+      const toggleItem = e.target.closest(".toggle-item");
+      if (toggleItem) {
+        const toggle = toggleItem.querySelector(".toggle-switch");
+        const feature = toggle.dataset.toggle;
+        toggle.classList.toggle("on");
+        settings.features[feature] = toggle.classList.contains("on");
+      }
+    });
+
+    // Initialize
+    updateProgress();
+  </script>
+</body>
+</html>
