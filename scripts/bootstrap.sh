@@ -96,7 +96,7 @@ configure_build() {
 main() {
     echo ""
     echo "  ╔═══════════════════════════════════════╗"
-    echo "  ║        Solace Browser Bootstrap        ║"
+    echo "  ║        Solace Browser Bootstrap       ║"
     echo "  ╚═══════════════════════════════════════╝"
     echo ""
 

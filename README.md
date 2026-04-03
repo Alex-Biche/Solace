@@ -59,6 +59,7 @@ Solace/
 xcode-select --install
 brew install mercurial python3 rust
 ```
+macOS binaries will be released soon for the most recent versions of macOS.
 
 ### Linux (Debian/Ubuntu)
 ```bash
@@ -68,7 +69,7 @@ sudo apt install mercurial python3 python3-pip build-essential \
 ```
 
 ### Windows
-Install [MozillaBuild](https://ftp.mozilla.org/pub/mozilla/libraries/win32/MozillaBuildSetup-Latest.exe) and use the Mozilla Build shell.
+Solace Browser is not supported on Windows
 
 ---
 
@@ -275,8 +276,6 @@ Solace uses the same architecture as other Firefox forks:
 5. **XUL overlay** injects Solace scripts and styles into `browser.xhtml`
 6. **JAR manifest** maps `chrome://solace/` URLs to our component files
 7. **Built-in extensions** ship pre-installed (ad blocker)
-
-This means Solace is a **real Gecko browser** — not Electron, not a skin, not a wrapper. It compiles the full Firefox source with our modifications baked in.
 
 ---
 
