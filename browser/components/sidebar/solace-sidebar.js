@@ -18,7 +18,9 @@ var SolaceSidebar = {
   _tabHeatmap: new Map(),
   _tabIdCounter: 0,
 
-  TAB_SLEEP_TIMEOUT: 5 * 60 * 1000, // 5 minutes of inactivity
+  get TAB_SLEEP_TIMEOUT() {
+    return Services.prefs.getIntPref("solace.tab-sleep.timeout-minutes", 5) * 60 * 1000;
+  },
 
   init() {
     this._buildSidebar();
@@ -47,7 +49,7 @@ var SolaceSidebar = {
     const profileAvatar = this._createElement("div", {
       className: "solace-profile-avatar",
       textContent: "S",
-      style: "background: var(--solace-purple);",
+      style: "background: var(--solace-accent-user, var(--solace-purple));",
     });
     const profileName = this._createElement("span", {
       className: "solace-profile-name",
@@ -487,10 +489,20 @@ var SolaceSidebar = {
 
   _sleepTab(tab) {
     if (tab.selected || tab.pinned) return;
+    // Respect user prefs for sleep exclusions
+    if (Services.prefs.getBoolPref("solace.tab-sleep.exclude-pinned", true) && tab.pinned) return;
+    if (Services.prefs.getBoolPref("solace.tab-sleep.exclude-playing-audio", true) && tab.soundPlaying) return;
+    if (!Services.prefs.getBoolPref("solace.tab-sleep.enabled", true)) return;
 
     if (!tab.hasAttribute("pending")) {
-      gBrowser.discardBrowser(tab);
+      try {
+        gBrowser.discardBrowser(tab);
+      } catch (e) {
+        console.debug("[Solace Sidebar] Could not discard tab:", e.message);
+        return;
+      }
 
+      tab.setAttribute("solace-sleeping", "true");
       const el = this._findTabElement(tab);
       if (el) el.setAttribute("sleeping", "");
     }

@@ -68,6 +68,24 @@ NEWTAB_DIR="$FIREFOX_DIR/browser/components/solace/newtab"
 mkdir -p "$NEWTAB_DIR"
 cp -r "$PROJECT_ROOT/browser/components/newtab/"* "$NEWTAB_DIR/"
 
+# ── Keybindings ──────────────────────────────────────────────────────────────
+log "Applying keybindings component..."
+KEYBINDINGS_DIR="$FIREFOX_DIR/browser/components/solace/keybindings"
+mkdir -p "$KEYBINDINGS_DIR"
+cp -r "$PROJECT_ROOT/browser/components/keybindings/"* "$KEYBINDINGS_DIR/"
+
+# ── Privacy panel ────────────────────────────────────────────────────────────
+log "Applying privacy panel..."
+PRIVACY_DIR="$FIREFOX_DIR/browser/components/solace/privacy"
+mkdir -p "$PRIVACY_DIR"
+cp -r "$PROJECT_ROOT/browser/components/privacy/"* "$PRIVACY_DIR/"
+
+# ── Status bar ───────────────────────────────────────────────────────────────
+log "Applying status bar..."
+STATUSBAR_DIR="$FIREFOX_DIR/browser/components/solace/statusbar"
+mkdir -p "$STATUSBAR_DIR"
+cp -r "$PROJECT_ROOT/browser/components/statusbar/"* "$STATUSBAR_DIR/"
+
 # ── Extensions ────────────────────────────────────────────────────────────────
 log "Copying built-in extensions..."
 EXT_DIR="$FIREFOX_DIR/browser/extensions"

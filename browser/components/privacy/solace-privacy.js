@@ -279,18 +279,29 @@ var SolacePrivacy = {
         background:var(--solace-bg-secondary); border:1px solid var(--solace-border);
         font-size:12px; color:var(--solace-text-secondary); line-height:1.5;
       `;
+
+      const title = document.createElement("strong");
+      title.style.color = "var(--solace-text-primary)";
+
+      const code = document.createElement("code");
+      code.style.cssText = "background:var(--solace-bg-hover); padding:1px 4px; border-radius:3px;";
+
       if (this._currentRouting === "tor") {
-        statusBox.innerHTML = `
-          <strong style="color:var(--solace-text-primary);">Tor Configuration</strong><br>
-          Ensure Tor is running on <code style="background:var(--solace-bg-hover); padding:1px 4px; border-radius:3px;">127.0.0.1:9050</code><br>
-          Traffic is routed through SOCKS5 proxy to Tor.
-        `;
+        title.textContent = "Tor Configuration";
+        code.textContent = "127.0.0.1:9050";
+        statusBox.append(
+          title, document.createElement("br"),
+          document.createTextNode("Ensure Tor is running on "), code, document.createElement("br"),
+          document.createTextNode("Traffic is routed through SOCKS5 proxy to Tor.")
+        );
       } else {
-        statusBox.innerHTML = `
-          <strong style="color:var(--solace-text-primary);">I2P Configuration</strong><br>
-          Ensure I2P router is running on <code style="background:var(--solace-bg-hover); padding:1px 4px; border-radius:3px;">127.0.0.1:4444</code><br>
-          HTTP traffic is routed through I2P HTTP proxy.
-        `;
+        title.textContent = "I2P Configuration";
+        code.textContent = "127.0.0.1:4444";
+        statusBox.append(
+          title, document.createElement("br"),
+          document.createTextNode("Ensure I2P router is running on "), code, document.createElement("br"),
+          document.createTextNode("HTTP traffic is routed through I2P HTTP proxy.")
+        );
       }
       body.appendChild(statusBox);
     }

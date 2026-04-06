@@ -21,8 +21,8 @@
   --_sb-resize-w: 5px;
   --_sb-scroll-fade: 28px;
   --_sb-close-size: 20px;
-  --_sb-glow-color: rgba(108, 92, 231, 0.18);
-  --_sb-glow-color-strong: rgba(108, 92, 231, 0.30);
+  --_sb-glow-color: rgba(var(--solace-accent-rgb, 108, 92, 231), 0.18);
+  --_sb-glow-color-strong: rgba(var(--solace-accent-rgb, 108, 92, 231), 0.30);
   --_sb-sleeping-opacity: 0.45;
   --_sb-group-border-w: 3px;
 }
@@ -555,7 +555,7 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  box-shadow: inset 0 0 0 1px rgba(108, 92, 231, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(var(--solace-accent-rgb, 108, 92, 231), 0.12);
   pointer-events: none;
 }
 
@@ -812,12 +812,12 @@
 
 .solace-tab[split-left]::after {
   border-inline-end-color: var(--solace-purple-light);
-  background: linear-gradient(90deg, rgba(108, 92, 231, 0.15) 50%, transparent 50%);
+  background: linear-gradient(90deg, rgba(var(--solace-accent-rgb, 108, 92, 231), 0.15) 50%, transparent 50%);
 }
 
 .solace-tab[split-right]::after {
   border-inline-start-color: var(--solace-purple-light);
-  background: linear-gradient(90deg, transparent 50%, rgba(108, 92, 231, 0.15) 50%);
+  background: linear-gradient(90deg, transparent 50%, rgba(var(--solace-accent-rgb, 108, 92, 231), 0.15) 50%);
 }
 
 /* ── New Tab Button — Subtle ──────────────────────────────────────────────── */
@@ -943,7 +943,7 @@
 }
 
 #solace-sidebar-resize[dragging] {
-  background: rgba(108, 92, 231, 0.08);
+  background: rgba(var(--solace-accent-rgb, 108, 92, 231), 0.08);
 }
 
 /* ── Reduced Motion ───────────────────────────────────────────────────────── */

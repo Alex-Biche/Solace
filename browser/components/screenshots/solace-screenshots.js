@@ -105,8 +105,8 @@ var SolaceScreenshots = {
 
     const selBox = document.createElement("div");
     selBox.style.cssText = `
-      position: absolute; border: 2px solid var(--solace-purple);
-      background: rgba(108,92,231,0.1); display: none;
+      position: absolute; border: 2px solid var(--solace-accent-user, var(--solace-purple));
+      background: var(--solace-accent-light, rgba(108,92,231,0.1)); display: none;
     `;
     overlay.appendChild(selBox);
 

@@ -387,7 +387,7 @@ var SolaceKeybindings = {
           border-radius:6px; font-size:12px; color:var(--solace-text-secondary);
           font-family: var(--solace-font-mono); cursor:pointer; min-width:80px;
           justify-content:center; transition: all 120ms;
-          ${this._recording === binding.id ? "border-color:var(--solace-purple); background:rgba(108,92,231,0.1); color:var(--solace-purple-light);" : ""}
+          ${this._recording === binding.id ? "border-color:var(--solace-accent-user, var(--solace-purple)); background:var(--solace-accent-light); color:var(--solace-text-accent);" : ""}
         `;
         keyBadge.textContent = this._recording === binding.id
           ? "Press keys..."

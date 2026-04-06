@@ -69,6 +69,13 @@ var SolaceCommandBar = {
     { id: "workspace-new",   label: "New Workspace",       icon: "W",  action() { SolaceWorkspaces.createWorkspace(); } },
     { id: "ai-panel",        label: "AI Panel",            icon: "A",  action() { SolaceAIPanel.toggle(); } },
     { id: "pipe",            label: "Pipe - Share to Device", icon: "Q", action() { SolacePipe.showShareDialog(); } },
+    { id: "privacy-panel",   label: "Privacy & Network Panel", icon: "\u{1F6E1}", action() { SolacePrivacy.toggle(); } },
+    { id: "keybindings",     label: "Keyboard Shortcuts",    icon: "\u2328", action() { SolaceKeybindings.toggle(); } },
+    { id: "reload",          label: "Reload Page",           icon: "R",  action() { gBrowser.selectedBrowser.reload(); } },
+    { id: "hard-reload",     label: "Hard Reload (No Cache)",icon: "R",  action() { gBrowser.selectedBrowser.reloadWithFlags(Ci.nsIWebNavigation.LOAD_FLAGS_BYPASS_CACHE); } },
+    { id: "bookmark-page",   label: "Bookmark This Page",    icon: "\u2606", action() { PlacesCommandHook.bookmarkPage(); } },
+    { id: "print",           label: "Print Page",            icon: "\u{1F5A8}", action() { PrintUtils.startPrintWindow(gBrowser.selectedBrowser.browsingContext); } },
+    { id: "view-source",     label: "View Page Source",      icon: "<>", action() { BrowserViewSource(gBrowser.selectedBrowser); } },
   ],
 
   // ── Initialization ──────────────────────────────────────────────────────────
@@ -213,7 +220,7 @@ var SolaceCommandBar = {
     pillS.webkitBackdropFilter = "blur(60px) saturate(2)";
     pillS.border = "1px solid var(--solace-glass-border)";
     pillS.borderRadius = "var(--solace-border-radius-pill)";
-    pillS.boxShadow = "var(--solace-shadow-lg), 0 0 80px rgba(108, 92, 231, 0.08)";
+    pillS.boxShadow = "var(--solace-shadow-lg), var(--solace-accent-glow)";
     pillS.display = "flex";
     pillS.alignItems = "center";
     pillS.padding = "12px 24px";
@@ -340,11 +347,9 @@ var SolaceCommandBar = {
   },
 
   _bindGlobalShortcut() {
+    // Cmd+K is now handled by SolaceKeybindings.
+    // Only Escape needs local handling to close while visible.
     document.addEventListener("keydown", (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
-        e.preventDefault();
-        this.toggle();
-      }
       if (e.key === "Escape" && this._visible) {
         e.preventDefault();
         this.hide();
