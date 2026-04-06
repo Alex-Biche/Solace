@@ -70,11 +70,17 @@ var Solace = {
       console.error("[Solace] AI Panel error:", e);
     }
 
-    // ── Phase 6: First-run check ───────────────────────────────────
-    this._checkFirstRun();
+    // ── Phase 6: Settings, Privacy & Keybindings ──────────────────
+    try {
+      SolaceKeybindings.init();
+      SolacePrivacy.init();
+      SolaceStatusBar.init();
+    } catch (e) {
+      console.error("[Solace] Phase 6 error:", e);
+    }
 
-    // ── Phase 7: Keyboard shortcuts ────────────────────────────────
-    this._registerGlobalShortcuts();
+    // ── Phase 7: First-run check ──────────────────────────────────
+    this._checkFirstRun();
 
     console.log("[Solace] Initialization complete.");
   },
@@ -87,6 +93,7 @@ var Solace = {
     console.log("[Solace] Shutting down...");
 
     const components = [
+      SolaceKeybindings, SolaceStatusBar, SolacePrivacy,
       SolaceSidebar, SolaceWorkspaces, SolaceProfiles, SolaceTabGroups,
       SolaceCommandBar, SolaceSplitView, SolaceFocusMode, SolaceGhostMode,
       SolaceNotes, SolaceScreenshots, SolaceSessions, SolaceReadingQueue,
@@ -122,6 +129,9 @@ var Solace = {
       root.style.setProperty("--solace-glass-blur", "0px");
       root.style.setProperty("--solace-glass-bg", "var(--solace-bg-primary)");
     }
+
+    // Apply user accent color
+    this._applyAccentColor();
 
     // Load the Solace theme CSS
     const link = document.createElement("link");
@@ -251,6 +261,10 @@ var Solace = {
           if (pref) Services.prefs.setBoolPref(pref, enabled);
         }
       }
+      if (settings.routing && settings.routing !== "direct") {
+        Services.prefs.setStringPref("solace.privacy.routing", settings.routing);
+        try { SolacePrivacy._setRouting(settings.routing); } catch (e) {}
+      }
       if (settings.import && settings.import !== "none") {
         // Trigger Firefox's built-in import wizard
         try {
@@ -296,68 +310,21 @@ var Solace = {
     }
   },
 
-  // ── Global keyboard shortcuts ──────────────────────────────────
-  _registerGlobalShortcuts() {
-    document.addEventListener("keydown", (e) => {
-      const mod = e.ctrlKey || e.metaKey;
+  // ── Accent color application ───────────────────────────────────
+  _applyAccentColor() {
+    try {
+      const color = Services.prefs.getStringPref("solace.theme.accent-color", "#6C5CE7");
+      const root = document.documentElement;
+      root.style.setProperty("--solace-accent-user", color);
 
-      // Cmd/Ctrl + K — Command bar
-      if (mod && e.key === "k") {
-        e.preventDefault();
-        SolaceCommandBar.toggle();
-      }
-
-      // Cmd/Ctrl + B — Toggle sidebar
-      if (mod && e.key === "b" && !e.shiftKey) {
-        e.preventDefault();
-        SolaceSidebar._toggleCollapse();
-      }
-
-      // Cmd/Ctrl + Shift + S — Split view
-      if (mod && e.shiftKey && e.key === "S") {
-        e.preventDefault();
-        SolaceSplitView.toggle();
-      }
-
-      // Cmd/Ctrl + Shift + X — Screenshot
-      if (mod && e.shiftKey && e.key === "X") {
-        e.preventDefault();
-        SolaceScreenshots.capture();
-      }
-
-      // Cmd/Ctrl + Shift + N — Notes
-      if (mod && e.shiftKey && e.key === "N") {
-        e.preventDefault();
-        SolaceNotes.toggle();
-      }
-
-      // Cmd/Ctrl + Shift + F — Focus mode
-      if (mod && e.shiftKey && e.key === "F") {
-        e.preventDefault();
-        SolaceFocusMode.toggle();
-      }
-
-      // F11 — Focus mode (also)
-      if (e.key === "F11") {
-        e.preventDefault();
-        SolaceFocusMode.toggle();
-      }
-
-      // Cmd/Ctrl + Shift + A — AI Panel
-      if (mod && e.shiftKey && e.key === "A") {
-        e.preventDefault();
-        SolaceAIPanel.toggle();
-      }
-
-      // Cmd/Ctrl + 1-9 — Switch workspace
-      if (mod && e.key >= "1" && e.key <= "9" && e.altKey) {
-        e.preventDefault();
-        const index = parseInt(e.key) - 1;
-        if (SolaceWorkspaces._workspaces[index]) {
-          SolaceWorkspaces.switchToWorkspace(SolaceWorkspaces._workspaces[index].id);
-        }
-      }
-    });
+      // Derive lighter/darker variants
+      const r = parseInt(color.slice(1, 3), 16);
+      const g = parseInt(color.slice(3, 5), 16);
+      const b = parseInt(color.slice(5, 7), 16);
+      root.style.setProperty("--solace-accent-rgb", `${r}, ${g}, ${b}`);
+      root.style.setProperty("--solace-accent-light", `rgba(${r}, ${g}, ${b}, 0.15)`);
+      root.style.setProperty("--solace-accent-glow", `0 0 20px rgba(${r}, ${g}, ${b}, 0.15)`);
+    } catch (e) {}
   },
 };
 

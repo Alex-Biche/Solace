@@ -38,6 +38,13 @@ solace.jar:
   content/components/pipe/solace-pipe.js                           (components/pipe/solace-pipe.js)
   content/components/ai-panel/solace-ai-panel.js                   (components/ai-panel/solace-ai-panel.js)
 
+  # Settings & Privacy
+  content/components/keybindings/solace-keybindings.js             (components/keybindings/solace-keybindings.js)
+  content/components/privacy/solace-privacy.js                     (components/privacy/solace-privacy.js)
+
+  # Status bar
+  content/components/statusbar/solace-statusbar.js                 (components/statusbar/solace-statusbar.js)
+
   # Pages
   content/components/newtab/solace-newtab.html                     (components/newtab/solace-newtab.html)
   content/components/onboarding/solace-onboarding.html             (components/onboarding/solace-onboarding.html)

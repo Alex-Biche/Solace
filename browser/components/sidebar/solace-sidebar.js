@@ -16,6 +16,7 @@ var SolaceSidebar = {
   _multiSelected: new Set(),
   _tabSleepTimers: new Map(),
   _tabHeatmap: new Map(),
+  _tabIdCounter: 0,
 
   TAB_SLEEP_TIMEOUT: 5 * 60 * 1000, // 5 minutes of inactivity
 
@@ -30,74 +31,152 @@ var SolaceSidebar = {
     this._collapsed = Services.prefs.getBoolPref("solace.sidebar.collapsed", false);
     if (this._collapsed) {
       this._sidebar.setAttribute("collapsed", "");
+      this._updateCollapseIcon();
     }
   },
 
   // ── Build the sidebar DOM ────────────────────────────────────────────────
+  // Uses proper DOM APIs instead of innerHTML, which does not work reliably
+  // on XUL elements in Firefox chrome.
   _buildSidebar() {
     const sidebar = document.createXULElement("vbox");
     sidebar.id = "solace-sidebar";
 
-    sidebar.innerHTML = `
-      <div id="solace-profile-bar">
-        <div class="solace-profile-avatar" style="background: var(--solace-purple);">S</div>
-        <span class="solace-profile-name">Default Profile</span>
-        <span class="solace-profile-switcher-arrow">▾</span>
-      </div>
+    // -- Profile bar --
+    const profileBar = this._createElement("div", { id: "solace-profile-bar" });
+    const profileAvatar = this._createElement("div", {
+      className: "solace-profile-avatar",
+      textContent: "S",
+      style: "background: var(--solace-purple);",
+    });
+    const profileName = this._createElement("span", {
+      className: "solace-profile-name",
+      textContent: "Default Profile",
+    });
+    const profileArrow = this._createElement("span", {
+      className: "solace-profile-switcher-arrow",
+      textContent: "\u25BE", // ▾
+    });
+    profileBar.append(profileAvatar, profileName, profileArrow);
 
-      <div id="solace-workspace-bar">
-        <div class="solace-workspace-pill" active data-workspace="default">
-          <span class="workspace-icon">🏠</span>
-          <span class="solace-workspace-label">Home</span>
-          <span class="workspace-count">0</span>
-        </div>
-        <div class="solace-workspace-add" title="New Workspace">+</div>
-      </div>
+    // -- Workspace bar --
+    const workspaceBar = this._createElement("div", { id: "solace-workspace-bar" });
+    const workspacePill = this._createElement("div", { className: "solace-workspace-pill" });
+    workspacePill.setAttribute("active", "");
+    workspacePill.dataset.workspace = "default";
+    workspacePill.append(
+      this._createElement("span", { className: "workspace-icon", textContent: "\uD83C\uDFE0" }),
+      this._createElement("span", { className: "solace-workspace-label", textContent: "Home" }),
+      this._createElement("span", { className: "workspace-count", textContent: "0" })
+    );
+    const workspaceAdd = this._createElement("div", {
+      className: "solace-workspace-add",
+      textContent: "+",
+    });
+    workspaceAdd.title = "New Workspace";
+    workspaceBar.append(workspacePill, workspaceAdd);
 
-      <div id="solace-tab-search">
-        <input type="text" placeholder="Search tabs..." />
-      </div>
+    // -- Tab search --
+    const tabSearch = this._createElement("div", { id: "solace-tab-search" });
+    const searchInput = this._createElement("input", { type: "text" });
+    searchInput.placeholder = "Search tabs\u2026";
+    tabSearch.appendChild(searchInput);
 
-      <div id="solace-pinned-tabs"></div>
+    // -- Pinned tabs container --
+    const pinnedTabs = this._createElement("div", { id: "solace-pinned-tabs" });
 
-      <div id="solace-tab-list"></div>
+    // -- Tab list --
+    const tabList = this._createElement("div", { id: "solace-tab-list" });
+    tabList.setAttribute("role", "listbox");
+    tabList.tabIndex = 0;
 
-      <div id="solace-new-tab-btn">
-        <span class="plus-icon">+</span>
-        <span class="solace-sidebar-label">New Tab</span>
-      </div>
+    // -- New tab button --
+    const newTabBtn = this._createElement("div", { id: "solace-new-tab-btn" });
+    newTabBtn.append(
+      this._createElement("span", { className: "plus-icon", textContent: "+" }),
+      this._createElement("span", { className: "solace-sidebar-label", textContent: "New Tab" })
+    );
 
-      <div id="solace-sidebar-footer">
-        <div class="solace-sidebar-action" id="solace-btn-notes" title="Notes">📝</div>
-        <div class="solace-sidebar-action" id="solace-btn-reading" title="Reading Queue">📖</div>
-        <div class="solace-sidebar-action" id="solace-btn-sessions" title="Sessions">💾</div>
-        <div class="solace-sidebar-action" id="solace-btn-settings" title="Settings">⚙</div>
-        <div class="solace-sidebar-action" id="solace-sidebar-collapse" title="Collapse">◀</div>
-      </div>
+    // -- Footer --
+    const footer = this._createElement("div", { id: "solace-sidebar-footer" });
+    const footerButtons = [
+      { id: "solace-btn-notes", title: "Notes", text: "\uD83D\uDCDD" },
+      { id: "solace-btn-reading", title: "Reading Queue", text: "\uD83D\uDCD6" },
+      { id: "solace-btn-sessions", title: "Sessions", text: "\uD83D\uDCBE" },
+      { id: "solace-btn-settings", title: "Settings", text: "\u2699" },
+      { id: "solace-sidebar-collapse", title: "Collapse", text: "\u25C0" },
+    ];
+    for (const btn of footerButtons) {
+      const el = this._createElement("div", {
+        id: btn.id,
+        className: "solace-sidebar-action",
+        textContent: btn.text,
+      });
+      el.title = btn.title;
+      footer.appendChild(el);
+    }
 
-      <div id="solace-sidebar-resize"></div>
-    `;
+    // -- Resize handle --
+    const resizeHandle = this._createElement("div", { id: "solace-sidebar-resize" });
+
+    // Assemble sidebar
+    sidebar.append(
+      profileBar,
+      workspaceBar,
+      tabSearch,
+      pinnedTabs,
+      tabList,
+      newTabBtn,
+      footer,
+      resizeHandle
+    );
 
     // Insert before the browser content
     const browser = document.getElementById("browser");
     browser.parentNode.insertBefore(sidebar, browser);
-
-    // Shift content to make room for sidebar
     browser.style.marginLeft = "var(--solace-sidebar-width)";
 
     this._sidebar = sidebar;
-    this._tabList = sidebar.querySelector("#solace-tab-list");
-    this._pinnedContainer = sidebar.querySelector("#solace-pinned-tabs");
-    this._searchInput = sidebar.querySelector("#solace-tab-search input");
+    this._tabList = tabList;
+    this._pinnedContainer = pinnedTabs;
+    this._searchInput = searchInput;
+  },
+
+  // ── Utility: create an HTML element with properties ─────────────────────
+  _createElement(tag, props = {}) {
+    const el = document.createElement(tag);
+    for (const [key, value] of Object.entries(props)) {
+      if (key === "className") {
+        el.className = value;
+      } else if (key === "textContent") {
+        el.textContent = value;
+      } else if (key === "style" && typeof value === "string") {
+        el.setAttribute("style", value);
+      } else {
+        el[key] = value;
+      }
+    }
+    return el;
+  },
+
+  // ── Generate a stable tab identifier ────────────────────────────────────
+  // tab.linkedPanel can be undefined for lazy/discarded tabs, so we fall
+  // back to a monotonically increasing counter stored on the tab itself.
+  _getTabId(tab) {
+    if (tab.linkedPanel) {
+      return tab.linkedPanel;
+    }
+    if (!tab.__solaceId) {
+      tab.__solaceId = "solace-tab-" + (++this._tabIdCounter);
+    }
+    return tab.__solaceId;
   },
 
   // ── Event binding ────────────────────────────────────────────────────────
   _bindEvents() {
     // New tab button
     this._sidebar.querySelector("#solace-new-tab-btn").addEventListener("click", () => {
-      gBrowser.addTab("about:solace-newtab", {
-        triggeringPrincipal: Services.scriptSecurityManager.getSystemPrincipal(),
-      });
+      this._openNewTab();
     });
 
     // Collapse toggle
@@ -110,8 +189,9 @@ var SolaceSidebar = {
       this._filterTabs(e.target.value);
     });
 
-    // Profile bar click
+    // Profile bar: click to switch profile, scroll to top of tab list
     this._sidebar.querySelector("#solace-profile-bar").addEventListener("click", () => {
+      this._tabList.scrollTo({ top: 0, behavior: "smooth" });
       SolaceProfiles.showProfileSwitcher();
     });
 
@@ -120,17 +200,27 @@ var SolaceSidebar = {
       SolaceWorkspaces.createWorkspace();
     });
 
+    // Double-click on empty space in tab list to create a new tab
+    this._tabList.addEventListener("dblclick", (e) => {
+      if (e.target === this._tabList) {
+        this._openNewTab();
+      }
+    });
+
+    // Keyboard navigation within the sidebar tab list
+    this._tabList.addEventListener("keydown", (e) => this._onTabListKeydown(e));
+
     // Sidebar resize
     this._initResize();
 
     // Listen for Firefox tab events
-    gBrowser.tabContainer.addEventListener("TabOpen", (e) => this._onTabOpen(e));
-    gBrowser.tabContainer.addEventListener("TabClose", (e) => this._onTabClose(e));
-    gBrowser.tabContainer.addEventListener("TabSelect", (e) => this._onTabSelect(e));
-    gBrowser.tabContainer.addEventListener("TabAttrModified", (e) => this._onTabAttrModified(e));
-    gBrowser.tabContainer.addEventListener("TabMove", (e) => this._onTabMove(e));
-    gBrowser.tabContainer.addEventListener("TabPinned", (e) => this._onTabPinned(e));
-    gBrowser.tabContainer.addEventListener("TabUnpinned", (e) => this._onTabUnpinned(e));
+    const events = [
+      "TabOpen", "TabClose", "TabSelect", "TabAttrModified",
+      "TabMove", "TabPinned", "TabUnpinned",
+    ];
+    for (const evt of events) {
+      gBrowser.tabContainer.addEventListener(evt, (e) => this["_on" + evt](e));
+    }
 
     // Keyboard shortcut for sidebar toggle
     document.addEventListener("keydown", (e) => {
@@ -157,10 +247,22 @@ var SolaceSidebar = {
     });
   },
 
-  // ── Sync tabs from Firefox's internal tab list ────────────────────────────
+  // ── Open a new tab (shared helper) ──────────────────────────────────────
+  _openNewTab() {
+    gBrowser.addTab("about:solace-newtab", {
+      triggeringPrincipal: Services.scriptSecurityManager.getSystemPrincipal(),
+    });
+  },
+
+  // ── Sync tabs from Firefox's internal tab list ──────────────────────────
   _syncTabsFromBrowser() {
-    this._tabList.innerHTML = "";
-    this._pinnedContainer.innerHTML = "";
+    // Clear containers using DOM API (not innerHTML)
+    while (this._tabList.firstChild) {
+      this._tabList.firstChild.remove();
+    }
+    while (this._pinnedContainer.firstChild) {
+      this._pinnedContainer.firstChild.remove();
+    }
 
     for (const tab of gBrowser.tabs) {
       this._createTabElement(tab);
@@ -169,53 +271,58 @@ var SolaceSidebar = {
     this._updateWorkspaceCount();
   },
 
-  // ── Create a sidebar tab element for a Firefox tab ────────────────────────
+  // ── Create a sidebar tab element for a Firefox tab ──────────────────────
   _createTabElement(tab) {
-    const el = document.createElement("div");
-    el.className = "solace-tab";
-    el.dataset.tabId = tab.linkedPanel;
+    const tabId = this._getTabId(tab);
+    const el = this._createElement("div", { className: "solace-tab" });
+    el.dataset.tabId = tabId;
+    el.setAttribute("role", "option");
     el._tab = tab;
 
-    const favicon = document.createElement("img");
-    favicon.className = "solace-tab-favicon";
+    // Favicon
+    const favicon = this._createElement("img", { className: "solace-tab-favicon" });
     favicon.src = tab.image || "chrome://branding/content/icon32.png";
-    favicon.onerror = () => { favicon.src = "chrome://branding/content/icon32.png"; };
+    favicon.addEventListener("error", () => {
+      favicon.src = "chrome://branding/content/icon32.png";
+    });
 
-    const title = document.createElement("span");
-    title.className = "solace-tab-title";
-    title.textContent = tab.label || "New Tab";
+    // Title with tooltip for truncated text
+    const title = this._createElement("span", {
+      className: "solace-tab-title",
+      textContent: tab.label || "New Tab",
+    });
+    title.title = tab.label || "New Tab";
 
-    const sleepIndicator = document.createElement("div");
-    sleepIndicator.className = "solace-tab-sleep-indicator";
+    // Sleep indicator
+    const sleepIndicator = this._createElement("div", { className: "solace-tab-sleep-indicator" });
     sleepIndicator.title = "Tab is sleeping";
 
-    const soundIcon = document.createElement("div");
-    soundIcon.className = "solace-tab-sound";
-    soundIcon.textContent = "🔊";
+    // Sound icon
+    const soundIcon = this._createElement("div", {
+      className: "solace-tab-sound",
+      textContent: "\uD83D\uDD0A", // speaker emoji
+    });
     soundIcon.addEventListener("click", (e) => {
       e.stopPropagation();
       tab.toggleMuteAudio();
     });
 
-    const closeBtn = document.createElement("div");
-    closeBtn.className = "solace-tab-close";
-    closeBtn.textContent = "×";
+    // Close button
+    const closeBtn = this._createElement("div", {
+      className: "solace-tab-close",
+      textContent: "\u00D7", // multiplication sign
+    });
     closeBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       gBrowser.removeTab(tab);
     });
 
-    const heatmap = document.createElement("div");
-    heatmap.className = "solace-tab-heatmap";
+    // Heatmap overlay
+    const heatmap = this._createElement("div", { className: "solace-tab-heatmap" });
 
-    el.appendChild(favicon);
-    el.appendChild(title);
-    el.appendChild(sleepIndicator);
-    el.appendChild(soundIcon);
-    el.appendChild(closeBtn);
-    el.appendChild(heatmap);
+    el.append(favicon, title, sleepIndicator, soundIcon, closeBtn, heatmap);
 
-    // Click to select
+    // Left click to select, with modifier support
     el.addEventListener("click", (e) => {
       if (e.ctrlKey || e.metaKey) {
         this._toggleMultiSelect(tab, el);
@@ -224,6 +331,14 @@ var SolaceSidebar = {
       } else {
         this._clearMultiSelect();
         gBrowser.selectedTab = tab;
+      }
+    });
+
+    // Middle-click to close
+    el.addEventListener("auxclick", (e) => {
+      if (e.button === 1) {
+        e.preventDefault();
+        gBrowser.removeTab(tab);
       }
     });
 
@@ -239,11 +354,11 @@ var SolaceSidebar = {
     el.addEventListener("drop", (e) => this._onDrop(e, tab));
     el.addEventListener("dragend", (e) => this._onDragEnd(e));
 
-    // Update state
+    // Update state attributes
     if (tab.selected) el.setAttribute("selected", "");
     if (tab.pinned) el.setAttribute("pinned", "");
     if (tab.soundPlaying) el.setAttribute("audible", "");
-    if (tab.hasAttribute("pending")) el.setAttribute("sleeping", "");
+    if (tab.hasAttribute && tab.hasAttribute("pending")) el.setAttribute("sleeping", "");
 
     // Add to correct container
     if (tab.pinned) {
@@ -258,30 +373,48 @@ var SolaceSidebar = {
   // ── Tab event handlers ─────────────────────────────────────────────────────
   _onTabOpen(e) {
     const el = this._createTabElement(e.target);
-    el.style.animation = "solace-slide-in-left 200ms ease-out";
+    // Subtle entrance animation
+    el.animate(
+      [
+        { opacity: 0, transform: "translateX(-12px)" },
+        { opacity: 1, transform: "translateX(0)" },
+      ],
+      { duration: 200, easing: "ease-out", fill: "forwards" }
+    );
     this._updateWorkspaceCount();
     this._resetTabSleepTimer(e.target);
+    // Scroll the new tab into view
+    el.scrollIntoView({ block: "nearest", behavior: "smooth" });
   },
 
   _onTabClose(e) {
     const el = this._findTabElement(e.target);
     if (el) {
-      el.style.animation = "solace-fade-in 150ms ease-out reverse";
-      el.addEventListener("animationend", () => el.remove());
+      const anim = el.animate(
+        [
+          { opacity: 1, transform: "translateX(0)" },
+          { opacity: 0, transform: "translateX(-12px)" },
+        ],
+        { duration: 150, easing: "ease-in", fill: "forwards" }
+      );
+      anim.onfinish = () => el.remove();
     }
     this._tabSleepTimers.delete(e.target);
+    this._tabHeatmap.delete(e.target);
+    this._multiSelected.delete(e.target);
     this._updateWorkspaceCount();
   },
 
   _onTabSelect(e) {
     // Deselect all
-    this._sidebar.querySelectorAll(".solace-tab[selected]").forEach((el) => {
+    for (const el of this._sidebar.querySelectorAll(".solace-tab[selected]")) {
       el.removeAttribute("selected");
-    });
+    }
 
     const el = this._findTabElement(e.target);
     if (el) {
       el.setAttribute("selected", "");
+      // Scroll selected tab into view
       el.scrollIntoView({ block: "nearest", behavior: "smooth" });
     }
 
@@ -299,8 +432,14 @@ var SolaceSidebar = {
     const title = el.querySelector(".solace-tab-title");
     const favicon = el.querySelector(".solace-tab-favicon");
 
-    if (title) title.textContent = tab.label || "New Tab";
-    if (favicon) favicon.src = tab.image || "chrome://branding/content/icon32.png";
+    if (title) {
+      const label = tab.label || "New Tab";
+      title.textContent = label;
+      title.title = label;
+    }
+    if (favicon) {
+      favicon.src = tab.image || "chrome://branding/content/icon32.png";
+    }
 
     if (tab.soundPlaying) {
       el.setAttribute("audible", "");
@@ -331,7 +470,6 @@ var SolaceSidebar = {
 
   // ── Tab sleep system ───────────────────────────────────────────────────────
   _initTabSleep() {
-    // Periodically check for inactive tabs
     setInterval(() => this._checkSleepingTabs(), 60000);
   },
 
@@ -350,7 +488,6 @@ var SolaceSidebar = {
   _sleepTab(tab) {
     if (tab.selected || tab.pinned) return;
 
-    // Discard the tab (Firefox's built-in mechanism)
     if (!tab.hasAttribute("pending")) {
       gBrowser.discardBrowser(tab);
 
@@ -390,7 +527,11 @@ var SolaceSidebar = {
     const heatmap = el.querySelector(".solace-tab-heatmap");
     if (!heatmap) return;
 
-    const maxCount = Math.max(...this._tabHeatmap.values(), 1);
+    const values = this._tabHeatmap.values();
+    let maxCount = 1;
+    for (const v of values) {
+      if (v > maxCount) maxCount = v;
+    }
     const intensity = count / maxCount;
 
     const r = Math.round(108 + (255 - 108) * intensity);
@@ -412,7 +553,7 @@ var SolaceSidebar = {
   },
 
   _rangeSelect(targetTab) {
-    const tabs = [...gBrowser.tabs];
+    const tabs = Array.from(gBrowser.tabs);
     const currentIndex = tabs.indexOf(gBrowser.selectedTab);
     const targetIndex = tabs.indexOf(targetTab);
 
@@ -431,14 +572,15 @@ var SolaceSidebar = {
 
   _clearMultiSelect() {
     this._multiSelected.clear();
-    this._sidebar.querySelectorAll(".solace-tab[multiselected]").forEach((el) => {
+    for (const el of this._sidebar.querySelectorAll(".solace-tab[multiselected]")) {
       el.removeAttribute("multiselected");
-    });
+    }
   },
 
   // ── Drag and drop ──────────────────────────────────────────────────────────
   _onDragStart(e, tab) {
-    e.dataTransfer.setData("text/plain", tab.linkedPanel);
+    const tabId = this._getTabId(tab);
+    e.dataTransfer.setData("text/plain", tabId);
     e.target.setAttribute("dragging", "");
   },
 
@@ -449,34 +591,62 @@ var SolaceSidebar = {
 
   _onDrop(e, targetTab) {
     e.preventDefault();
-    const sourcePanel = e.dataTransfer.getData("text/plain");
-    const sourceTab = gBrowser.tabs.find((t) => t.linkedPanel === sourcePanel);
+    const sourceId = e.dataTransfer.getData("text/plain");
+
+    // gBrowser.tabs is an HTMLCollection, not an Array -- convert first
+    const sourceTab = Array.from(gBrowser.tabs).find(
+      (t) => this._getTabId(t) === sourceId
+    );
+
     if (sourceTab && sourceTab !== targetTab) {
       const targetIndex = Array.from(gBrowser.tabs).indexOf(targetTab);
-      gBrowser.moveTabTo(sourceTab, targetIndex);
+      if (targetIndex !== -1) {
+        gBrowser.moveTabTo(sourceTab, targetIndex);
+      }
     }
   },
 
   _onDragEnd(e) {
     e.target.removeAttribute("dragging");
-    this._sidebar.querySelectorAll(".solace-tab-drop-indicator").forEach((el) => el.remove());
+    for (const el of this._sidebar.querySelectorAll(".solace-tab-drop-indicator")) {
+      el.remove();
+    }
   },
 
-  // ── Tab search / filter ────────────────────────────────────────────────────
+  // ── Tab search / filter (fuzzy) ────────────────────────────────────────────
   _filterTabs(query) {
     const lower = query.toLowerCase();
-    this._tabList.querySelectorAll(".solace-tab").forEach((el) => {
-      const title = el.querySelector(".solace-tab-title").textContent.toLowerCase();
-      const match = !query || title.includes(lower);
+
+    for (const el of this._tabList.querySelectorAll(".solace-tab")) {
+      if (!query) {
+        el.style.display = "";
+        continue;
+      }
+      const title = (el.querySelector(".solace-tab-title").textContent || "").toLowerCase();
+      const match = this._fuzzyMatch(lower, title);
       el.style.display = match ? "" : "none";
-    });
+    }
+  },
+
+  /**
+   * Simple fuzzy match: every character in the pattern must appear in order
+   * within the target string, but not necessarily contiguously.
+   */
+  _fuzzyMatch(pattern, text) {
+    let pi = 0;
+    for (let ti = 0; ti < text.length && pi < pattern.length; ti++) {
+      if (text[ti] === pattern[pi]) {
+        pi++;
+      }
+    }
+    return pi === pattern.length;
   },
 
   // ── Tab context menu ───────────────────────────────────────────────────────
   _showTabContextMenu(e, tab) {
     e.preventDefault();
 
-    // Remove existing context menu if any
+    // Remove any existing context menu
     const existing = document.getElementById("solace-tab-context-menu");
     if (existing) existing.remove();
 
@@ -485,35 +655,44 @@ var SolaceSidebar = {
 
     const items = [
       { label: "Reload", action: () => gBrowser.reloadTab(tab) },
-      { label: tab.pinned ? "Unpin Tab" : "Pin Tab", action: () => {
-        if (tab.pinned) gBrowser.unpinTab(tab);
-        else gBrowser.pinTab(tab);
-      }},
+      {
+        label: tab.pinned ? "Unpin Tab" : "Pin Tab",
+        action: () => {
+          if (tab.pinned) gBrowser.unpinTab(tab);
+          else gBrowser.pinTab(tab);
+        },
+      },
       { type: "separator" },
       { label: "Split Left", action: () => SolaceSplitView.splitLeft(tab) },
       { label: "Split Right", action: () => SolaceSplitView.splitRight(tab) },
       { type: "separator" },
-      { label: "Move to Workspace...", action: () => SolaceWorkspaces.showMoveDialog(tab) },
-      { label: "Add to Group...", action: () => this._showGroupDialog(tab) },
-      { label: "Set Site Color...", action: () => this._showColorPicker(tab) },
+      { label: "Move to Workspace\u2026", action: () => SolaceWorkspaces.showMoveDialog(tab) },
+      { label: "Add to Group\u2026", action: () => this._showGroupDialog(tab) },
+      { label: "Set Site Color\u2026", action: () => this._showColorPicker(tab) },
       { type: "separator" },
       { label: "Duplicate Tab", action: () => gBrowser.duplicateTab(tab) },
       { label: "Sleep Tab", action: () => this._sleepTab(tab) },
       { label: "Save to Reading Queue", action: () => SolaceReadingQueue.addFromTab(tab) },
       { type: "separator" },
-      { label: this._multiSelected.size > 1 ? `Close ${this._multiSelected.size} Tabs` : "Close Tab",
+      {
+        label: this._multiSelected.size > 1
+          ? `Close ${this._multiSelected.size} Tabs`
+          : "Close Tab",
         action: () => {
           if (this._multiSelected.size > 1) {
-            this._multiSelected.forEach((t) => gBrowser.removeTab(t));
+            for (const t of this._multiSelected) {
+              gBrowser.removeTab(t);
+            }
             this._clearMultiSelect();
           } else {
             gBrowser.removeTab(tab);
           }
-        }
+        },
       },
-      { label: "Close Other Tabs", action: () => {
-        gBrowser.removeAllTabsBut(tab);
-      }},
+      {
+        label: "Close Other Tabs",
+        action: () => gBrowser.removeAllTabsBut(tab),
+      },
     ];
 
     for (const item of items) {
@@ -527,24 +706,72 @@ var SolaceSidebar = {
       }
     }
 
-    document.getElementById("mainPopupSet").appendChild(menu);
-    menu.openPopupAtScreen(e.screenX, e.screenY, true);
+    const popupSet = document.getElementById("mainPopupSet");
+    popupSet.appendChild(menu);
+
+    // Use proper XUL popup positioning: anchor at screen coordinates
+    menu.openPopup(null, "after_pointer", 0, 0, true, false, e);
   },
 
   _showGroupDialog(tab) {
-    // Dispatch to tab groups component
     SolaceTabGroups.showAssignDialog(tab);
   },
 
   _showColorPicker(tab) {
-    // Simple per-site color tagging
-    const colors = ["#d63031", "#e17055", "#ffeaa7", "#00cec9", "#74b9ff", "#6C5CE7", "#fd79a8", "#636e72"];
-    // Would show a popup color picker
-    const color = colors[Math.floor(Math.random() * colors.length)]; // placeholder
+    const colors = [
+      "#d63031", "#e17055", "#ffeaa7", "#00cec9",
+      "#74b9ff", "#6C5CE7", "#fd79a8", "#636e72",
+    ];
+    // Placeholder: pick a random color. A real implementation would show a popup picker.
+    const color = colors[Math.floor(Math.random() * colors.length)];
     const el = this._findTabElement(tab);
     if (el) {
       el.setAttribute("data-site-color", "");
       el.style.setProperty("--tab-site-color", color);
+    }
+  },
+
+  // ── Keyboard navigation within the sidebar ─────────────────────────────────
+  _onTabListKeydown(e) {
+    const tabEls = Array.from(this._tabList.querySelectorAll(".solace-tab:not([style*='display: none'])"));
+    if (!tabEls.length) return;
+
+    const currentEl = this._tabList.querySelector(".solace-tab[selected]");
+    const currentIndex = currentEl ? tabEls.indexOf(currentEl) : -1;
+    let nextIndex = -1;
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        nextIndex = currentIndex < tabEls.length - 1 ? currentIndex + 1 : 0;
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        nextIndex = currentIndex > 0 ? currentIndex - 1 : tabEls.length - 1;
+        break;
+      case "Home":
+        e.preventDefault();
+        nextIndex = 0;
+        break;
+      case "End":
+        e.preventDefault();
+        nextIndex = tabEls.length - 1;
+        break;
+      case "Delete":
+        if (currentEl && currentEl._tab) {
+          e.preventDefault();
+          gBrowser.removeTab(currentEl._tab);
+        }
+        return;
+      default:
+        return;
+    }
+
+    if (nextIndex >= 0 && nextIndex < tabEls.length) {
+      const nextTab = tabEls[nextIndex]._tab;
+      if (nextTab) {
+        gBrowser.selectedTab = nextTab;
+      }
     }
   },
 
@@ -560,7 +787,16 @@ var SolaceSidebar = {
       document.getElementById("browser").style.marginLeft = "var(--solace-sidebar-width)";
     }
 
+    this._updateCollapseIcon();
     Services.prefs.setBoolPref("solace.sidebar.collapsed", this._collapsed);
+  },
+
+  // Flip the collapse icon direction based on state
+  _updateCollapseIcon() {
+    const btn = this._sidebar.querySelector("#solace-sidebar-collapse");
+    if (btn) {
+      btn.textContent = this._collapsed ? "\u25B6" : "\u25C0"; // ▶ when collapsed, ◀ when expanded
+    }
   },
 
   // ── Sidebar resize ────────────────────────────────────────────────────────
@@ -574,9 +810,9 @@ var SolaceSidebar = {
       this._resizing = true;
       handle.setAttribute("dragging", "");
 
-      const onMove = (e) => {
+      const onMove = (moveEvt) => {
         if (!this._resizing) return;
-        const newWidth = Math.max(180, Math.min(500, startWidth + e.clientX - startX));
+        const newWidth = Math.max(180, Math.min(500, startWidth + moveEvt.clientX - startX));
         document.documentElement.style.setProperty("--solace-sidebar-width", newWidth + "px");
         Services.prefs.setIntPref("solace.sidebar.width", newWidth);
       };
@@ -595,19 +831,29 @@ var SolaceSidebar = {
 
   // ── Helpers ────────────────────────────────────────────────────────────────
   _findTabElement(tab) {
-    return this._sidebar.querySelector(`.solace-tab[data-tab-id="${tab.linkedPanel}"]`);
+    const tabId = this._getTabId(tab);
+    if (!tabId) return null;
+    return this._sidebar.querySelector(`.solace-tab[data-tab-id="${CSS.escape(tabId)}"]`);
   },
 
   _updateWorkspaceCount() {
-    const count = gBrowser.tabs.length;
-    const activeWorkspacePill = this._sidebar.querySelector(".solace-workspace-pill[active] .workspace-count");
-    if (activeWorkspacePill) {
-      activeWorkspacePill.textContent = count;
+    // Count only non-pinned tabs for the active workspace pill
+    let count = 0;
+    for (const tab of gBrowser.tabs) {
+      if (!tab.pinned) count++;
+    }
+    const pill = this._sidebar.querySelector(".solace-workspace-pill[active] .workspace-count");
+    if (pill) {
+      pill.textContent = String(count);
     }
   },
 
   uninit() {
-    this._tabSleepTimers.forEach((timer) => clearTimeout(timer));
+    for (const timer of this._tabSleepTimers.values()) {
+      clearTimeout(timer);
+    }
     this._tabSleepTimers.clear();
+    this._tabHeatmap.clear();
+    this._multiSelected.clear();
   },
 };

@@ -7,28 +7,34 @@
   <style>
     :root {
       --bg: #0a0a0f;
-      --text: rgba(255, 255, 255, 0.9);
-      --text-dim: rgba(255, 255, 255, 0.35);
-      --text-muted: rgba(255, 255, 255, 0.55);
+      --text: rgba(255, 255, 255, 0.92);
+      --text-dim: rgba(255, 255, 255, 0.30);
+      --text-muted: rgba(255, 255, 255, 0.50);
       --accent: #6C5CE7;
       --accent-light: #a29bfe;
+      --accent-rgb: 108, 92, 231;
       --surface: rgba(255, 255, 255, 0.04);
+      --surface-hover: rgba(255, 255, 255, 0.07);
       --border: rgba(255, 255, 255, 0.06);
-      --glass-bg: rgba(18, 18, 30, 0.6);
-      --glass-blur: 20px;
+      --glass-bg: rgba(18, 18, 30, 0.55);
+      --glass-blur: 24px;
       --radius: 16px;
+      --radius-sm: 10px;
       --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      --font-mono: "SF Mono", "Cascadia Code", "JetBrains Mono", monospace;
+      --transition: 200ms ease-out;
     }
 
     @media (prefers-color-scheme: light) {
       :root {
-        --bg: #f5f5fa;
-        --text: rgba(0, 0, 0, 0.85);
-        --text-dim: rgba(0, 0, 0, 0.25);
-        --text-muted: rgba(0, 0, 0, 0.5);
+        --bg: #f0f0f5;
+        --text: rgba(0, 0, 0, 0.87);
+        --text-dim: rgba(0, 0, 0, 0.22);
+        --text-muted: rgba(0, 0, 0, 0.45);
         --surface: rgba(0, 0, 0, 0.03);
+        --surface-hover: rgba(0, 0, 0, 0.06);
         --border: rgba(0, 0, 0, 0.06);
-        --glass-bg: rgba(245, 245, 250, 0.7);
+        --glass-bg: rgba(255, 255, 255, 0.65);
       }
     }
 
@@ -51,36 +57,38 @@
     .bg-orb {
       position: fixed;
       border-radius: 50%;
-      filter: blur(100px);
-      opacity: 0.08;
+      filter: blur(120px);
+      opacity: 0.06;
       pointer-events: none;
-      animation: float 20s ease-in-out infinite;
+      animation: float 25s ease-in-out infinite;
+      will-change: transform;
     }
 
     .bg-orb-1 {
-      width: 600px; height: 600px;
+      width: 700px; height: 700px;
       background: var(--accent);
-      top: -200px; left: -100px;
+      top: -250px; left: -150px;
     }
 
     .bg-orb-2 {
-      width: 400px; height: 400px;
+      width: 500px; height: 500px;
       background: #74b9ff;
-      bottom: -150px; right: -50px;
-      animation-delay: -7s;
+      bottom: -180px; right: -80px;
+      animation-delay: -8s;
     }
 
     .bg-orb-3 {
-      width: 300px; height: 300px;
+      width: 350px; height: 350px;
       background: #fd79a8;
-      top: 30%; right: 20%;
-      animation-delay: -14s;
+      top: 25%; right: 15%;
+      animation-delay: -16s;
     }
 
     @keyframes float {
       0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(30px, -20px) scale(1.05); }
-      66% { transform: translate(-20px, 15px) scale(0.95); }
+      25% { transform: translate(25px, -15px) scale(1.03); }
+      50% { transform: translate(-15px, 20px) scale(0.97); }
+      75% { transform: translate(10px, -25px) scale(1.02); }
     }
 
     /* ── Main content ─────────────────────────────────────────── */
@@ -89,37 +97,45 @@
       z-index: 1;
       text-align: center;
       width: 100%;
-      max-width: 640px;
+      max-width: 680px;
       padding: 0 24px;
     }
 
     /* ── Clock ────────────────────────────────────────────────── */
     .clock {
-      font-size: 72px;
+      font-size: 80px;
       font-weight: 200;
-      letter-spacing: -2px;
+      letter-spacing: -3px;
       line-height: 1;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       background: linear-gradient(135deg, var(--text), var(--text-muted));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      font-variant-numeric: tabular-nums;
     }
 
     .date {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 400;
       color: var(--text-dim);
-      letter-spacing: 2px;
+      letter-spacing: 3px;
       text-transform: uppercase;
-      margin-bottom: 48px;
+      margin-bottom: 44px;
+    }
+
+    .greeting {
+      font-size: 16px;
+      font-weight: 300;
+      color: var(--text-muted);
+      margin-bottom: 6px;
     }
 
     /* ── Search bar ───────────────────────────────────────────── */
     .search-container {
       position: relative;
       width: 100%;
-      margin-bottom: 48px;
+      margin-bottom: 40px;
     }
 
     .search-input {
@@ -134,7 +150,7 @@
       font-size: 16px;
       color: var(--text);
       outline: none;
-      transition: border-color 200ms, box-shadow 200ms;
+      transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
     }
 
     .search-input::placeholder {
@@ -142,8 +158,9 @@
     }
 
     .search-input:focus {
-      border-color: rgba(108, 92, 231, 0.4);
-      box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.08), 0 8px 32px rgba(0, 0, 0, 0.2);
+      border-color: rgba(var(--accent-rgb), 0.4);
+      box-shadow: 0 0 0 4px rgba(var(--accent-rgb), 0.06), 0 8px 32px rgba(0, 0, 0, 0.15);
+      transform: translateY(-1px);
     }
 
     .search-icon {
@@ -152,13 +169,13 @@
       top: 50%;
       transform: translateY(-50%);
       color: var(--text-dim);
-      font-size: 16px;
+      font-size: 15px;
       pointer-events: none;
     }
 
     .search-hint {
       position: absolute;
-      right: 16px;
+      right: 14px;
       top: 50%;
       transform: translateY(-50%);
       font-size: 11px;
@@ -168,14 +185,17 @@
       border-radius: 6px;
       border: 1px solid var(--border);
       pointer-events: none;
+      font-family: var(--font-mono);
+      letter-spacing: 0.5px;
     }
 
     /* ── Quick links ──────────────────────────────────────────── */
     .quick-links {
       display: flex;
       justify-content: center;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
+      margin-bottom: 36px;
     }
 
     .quick-link {
@@ -185,54 +205,90 @@
       padding: 10px 16px;
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: var(--radius-sm);
       text-decoration: none;
       color: var(--text-muted);
       font-size: 13px;
-      transition: all 200ms ease-out;
+      transition: all var(--transition);
       cursor: pointer;
+      position: relative;
     }
 
     .quick-link:hover {
-      background: rgba(108, 92, 231, 0.1);
-      border-color: rgba(108, 92, 231, 0.2);
+      background: var(--surface-hover);
+      border-color: rgba(var(--accent-rgb), 0.2);
       color: var(--text);
-      transform: translateY(-1px);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .quick-link:active {
+      transform: translateY(0);
     }
 
     .quick-link-icon {
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
       border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 12px;
+      font-size: 13px;
       background: var(--surface);
     }
 
-    /* ── Greeting ─────────────────────────────────────────────── */
-    .greeting {
-      font-size: 18px;
-      font-weight: 300;
+    /* ── Tip of the day ───────────────────────────────────────── */
+    .tip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 12px;
       color: var(--text-muted);
-      margin-bottom: 4px;
+      max-width: 500px;
+      margin: 0 auto;
+      text-align: left;
+      line-height: 1.5;
+    }
+
+    .tip-label {
+      font-weight: 600;
+      color: var(--accent-light);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      flex-shrink: 0;
+    }
+
+    .tip kbd {
+      display: inline-block;
+      padding: 1px 5px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
     }
 
     /* ── Bottom bar ───────────────────────────────────────────── */
     .bottom-bar {
       position: fixed;
-      bottom: 16px;
+      bottom: 18px;
       display: flex;
-      gap: 16px;
+      gap: 18px;
       font-size: 11px;
       color: var(--text-dim);
+      align-items: center;
     }
 
     .bottom-bar a {
       color: var(--text-dim);
       text-decoration: none;
-      transition: color 200ms;
+      transition: color var(--transition);
     }
 
     .bottom-bar a:hover {
@@ -241,16 +297,24 @@
 
     /* ── Animations ───────────────────────────────────────────── */
     .fade-in {
-      animation: fadeIn 600ms ease-out both;
+      animation: fadeIn 500ms ease-out both;
     }
 
-    .fade-in-delay-1 { animation-delay: 100ms; }
-    .fade-in-delay-2 { animation-delay: 200ms; }
-    .fade-in-delay-3 { animation-delay: 300ms; }
+    .fade-in-delay-1 { animation-delay: 80ms; }
+    .fade-in-delay-2 { animation-delay: 160ms; }
+    .fade-in-delay-3 { animation-delay: 240ms; }
+    .fade-in-delay-4 { animation-delay: 320ms; }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
+      from { opacity: 0; transform: translateY(8px); }
       to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
     }
   </style>
 </head>
@@ -266,7 +330,7 @@
     <div class="date fade-in fade-in-delay-1" id="date"></div>
 
     <div class="search-container fade-in fade-in-delay-2">
-      <span class="search-icon">🔍</span>
+      <span class="search-icon">&#x1F50D;</span>
       <input
         class="search-input"
         type="text"
@@ -274,16 +338,22 @@
         placeholder="Search or enter URL..."
         autofocus
         autocomplete="off"
+        spellcheck="false"
       />
-      <span class="search-hint">⌘K commands</span>
+      <span class="search-hint">&#x2318;K</span>
     </div>
 
     <div class="quick-links fade-in fade-in-delay-3" id="quick-links">
       <!-- Populated dynamically -->
     </div>
+
+    <div class="tip fade-in fade-in-delay-4" id="tip">
+      <span class="tip-label">Tip</span>
+      <span id="tip-text"></span>
+    </div>
   </div>
 
-  <div class="bottom-bar fade-in fade-in-delay-3">
+  <div class="bottom-bar fade-in fade-in-delay-4">
     <span id="tab-count"></span>
   </div>
 
@@ -298,7 +368,7 @@
       document.getElementById("clock").textContent = `${hours}:${minutes}`;
 
       const options = { weekday: "long", month: "long", day: "numeric" };
-      document.getElementById("date").textContent = now.toLocaleDateString("en-US", options);
+      document.getElementById("date").textContent = now.toLocaleDateString(undefined, options);
     }
 
     updateClock();
@@ -308,10 +378,11 @@
     function updateGreeting() {
       const hour = new Date().getHours();
       let greeting;
-      if (hour < 6) greeting = "Good night";
+      if (hour < 5) greeting = "Good night";
       else if (hour < 12) greeting = "Good morning";
-      else if (hour < 18) greeting = "Good afternoon";
-      else greeting = "Good evening";
+      else if (hour < 17) greeting = "Good afternoon";
+      else if (hour < 21) greeting = "Good evening";
+      else greeting = "Good night";
 
       document.getElementById("greeting").textContent = greeting;
     }
@@ -325,24 +396,46 @@
         const query = searchInput.value.trim();
         if (!query) return;
 
-        // Check if it's a URL
-        if (/^(https?:\/\/|www\.)/.test(query) || /^[^\s]+\.[a-z]{2,}$/i.test(query)) {
+        // Bang support
+        const bangMatch = query.match(/^!(\w+)\s+(.*)/);
+        if (bangMatch) {
+          const bangs = {
+            g: "https://www.google.com/search?q=",
+            ddg: "https://duckduckgo.com/?q=",
+            yt: "https://www.youtube.com/results?search_query=",
+            gh: "https://github.com/search?q=",
+            w: "https://en.wikipedia.org/w/index.php?search=",
+            r: "https://www.reddit.com/search/?q=",
+            so: "https://stackoverflow.com/search?q=",
+            npm: "https://www.npmjs.com/search?q=",
+            mdn: "https://developer.mozilla.org/en-US/search?q=",
+          };
+          const engine = bangs[bangMatch[1]];
+          if (engine) {
+            window.location.href = engine + encodeURIComponent(bangMatch[2]);
+            return;
+          }
+        }
+
+        // URL detection
+        if (/^(https?:\/\/|www\.)/.test(query) || /^[^\s]+\.[a-z]{2,}(\/\S*)?$/i.test(query)) {
           let url = query;
           if (!url.startsWith("http")) url = "https://" + url;
           window.location.href = url;
         } else {
-          // Search with DuckDuckGo by default (privacy)
           window.location.href = `https://duckduckgo.com/?q=${encodeURIComponent(query)}`;
         }
       }
     });
 
-    // ── Quick links (most visited) ───────────────────────────────
+    // ── Quick links ──────────────────────────────────────────────
     const defaultLinks = [
-      { icon: "📧", title: "Mail", url: "https://mail.google.com" },
-      { icon: "📰", title: "News", url: "https://news.ycombinator.com" },
-      { icon: "💻", title: "GitHub", url: "https://github.com" },
-      { icon: "📺", title: "YouTube", url: "https://youtube.com" },
+      { icon: "\u{1F4E7}", title: "Mail", url: "https://mail.google.com" },
+      { icon: "\u{1F4F0}", title: "News", url: "https://news.ycombinator.com" },
+      { icon: "\u{1F4BB}", title: "GitHub", url: "https://github.com" },
+      { icon: "\u{1F4FA}", title: "YouTube", url: "https://youtube.com" },
+      { icon: "\u{1F4D6}", title: "Reddit", url: "https://reddit.com" },
+      { icon: "\u{1F30D}", title: "Wikipedia", url: "https://wikipedia.org" },
     ];
 
     const linksContainer = document.getElementById("quick-links");
@@ -350,15 +443,42 @@
       const a = document.createElement("a");
       a.className = "quick-link";
       a.href = link.url;
-      a.innerHTML = `
-        <span class="quick-link-icon">${link.icon}</span>
-        ${link.title}
-      `;
+
+      const iconSpan = document.createElement("span");
+      iconSpan.className = "quick-link-icon";
+      iconSpan.textContent = link.icon;
+
+      const titleText = document.createTextNode(link.title);
+      a.append(iconSpan, titleText);
       linksContainer.appendChild(a);
     }
 
+    // ── Tip of the day ───────────────────────────────────────────
+    const tips = [
+      "Press <kbd>\u2318K</kbd> to open the command bar from anywhere",
+      "Use <kbd>\u2318B</kbd> to toggle the sidebar",
+      "Try bangs in search: <kbd>!g</kbd> for Google, <kbd>!yt</kbd> for YouTube",
+      "Press <kbd>\u2318\u21E7F</kbd> to enter Focus Mode and hide all chrome",
+      "Right-click a tab to split it side-by-side with another tab",
+      "Hold <kbd>Alt</kbd> while hovering a link to preview it",
+      "Press <kbd>\u2318\u21E7N</kbd> to open the scratchpad notes panel",
+      "Use <kbd>\u2318\u21E7X</kbd> to capture a screenshot with annotations",
+      "Press <kbd>\u2318\u21E7I</kbd> to open the Privacy & Network panel",
+      "Inactive tabs are automatically suspended to save memory",
+      "Press <kbd>\u2318\u21E7G</kbd> for Ghost Mode — ultra-lightweight browsing",
+      "Customize all keyboard shortcuts in Settings \u2192 Keybindings",
+    ];
+
+    const tipIndex = Math.floor(Date.now() / 86400000) % tips.length;
+    document.getElementById("tip-text").innerHTML = tips[tipIndex];
+
     // ── Focus search on any keypress ─────────────────────────────
     document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        searchInput.value = "";
+        searchInput.blur();
+        return;
+      }
       if (e.key === "/" || (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey)) {
         if (document.activeElement !== searchInput) {
           searchInput.focus();

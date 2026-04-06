@@ -157,6 +157,9 @@ pref("solace.theme.translucent", true);
 pref("solace.theme.blur-intensity", 20);
 pref("solace.theme.density", "normal");  // "compact", "normal", "spacious"
 pref("solace.theme.adaptive-color", true);
+pref("solace.theme.accent-color", "#6C5CE7");
+pref("solace.theme.animations", true);
+pref("solace.theme.vibrancy", true);  // macOS native vibrancy
 
 // Workspaces
 pref("solace.workspaces.enabled", true);
@@ -184,6 +187,19 @@ pref("solace.ghost-mode.enabled", false);
 // Focus mode
 pref("solace.focus-mode.enabled", false);
 
+// Keybindings
+pref("solace.keybindings", "");  // JSON string of custom keybindings
+pref("solace.keybindings.enabled", true);
+
+// Privacy & Network Routing
+pref("solace.privacy.routing", "direct");  // "direct", "proxy", "tor", "i2p"
+pref("solace.proxy.type", "socks5");
+pref("solace.proxy.host", "");
+pref("solace.proxy.port", 0);
+
+// Status bar
+pref("solace.statusbar.enabled", true);
+
 // Productivity
 pref("solace.notes.enabled", true);
 pref("solace.screenshots.enabled", true);
@@ -207,6 +223,62 @@ pref("solace.split-view.enabled", true);
 
 // Preloading (privacy-respecting — only on hover, not speculative)
 pref("solace.preload-on-hover", true);
+
+// Tab sleep (suspend inactive tabs)
+pref("solace.tab-sleep.enabled", true);
+pref("solace.tab-sleep.timeout-minutes", 5);
+pref("solace.tab-sleep.exclude-pinned", true);
+pref("solace.tab-sleep.exclude-playing-audio", true);
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ADDITIONAL PRIVACY HARDENING
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Strict referrer policy
+pref("network.http.referer.XOriginPolicy", 2);
+pref("network.http.referer.XOriginTrimmingPolicy", 2);
+
+// Disable beacon (analytics on page unload)
+pref("beacon.enabled", false);
+
+// Disable battery API (fingerprinting vector)
+pref("dom.battery.enabled", false);
+
+// Disable gamepad API (fingerprinting vector)
+pref("dom.gamepad.enabled", false);
+
+// Restrict media device enumeration
+pref("media.navigator.enabled", false);
+
+// Disable WebGL by default for fingerprint protection (user can re-enable)
+pref("webgl.disabled", false);
+
+// Isolate DOM storage
+pref("dom.storage.next_gen", true);
+
+// Disable autoplay
+pref("media.autoplay.default", 5);  // block audio and video
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PERFORMANCE TUNING
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// JIT optimization
+pref("javascript.options.baselinejit", true);
+pref("javascript.options.ion", true);
+
+// Network performance
+pref("network.http.max-connections", 900);
+pref("network.http.max-persistent-connections-per-server", 8);
+pref("network.http.max-persistent-connections-per-proxy", 16);
+pref("network.http.pipelining", true);
+
+// Faster rendering
+pref("nglayout.initialpaint.delay", 0);
+pref("nglayout.initialpaint.delay_in_oopif", 0);
+
+// Session store — reduce write frequency
+pref("browser.sessionstore.interval", 30000);
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // DISABLED FIREFOX FEATURES
